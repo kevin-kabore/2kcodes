@@ -1,3 +1,8 @@
+Here is the updated design document including the decision to use Draft.js for
+JSON-based rich text content, along with the necessary changes to the entity
+model:
+
+````markdown
 # 1. Summary
 
 The project involves creating a personal website for Kevin Kaboré, consisting of
@@ -114,54 +119,54 @@ updates.
 
 ## Entity Models
 
-````typescript
+```typescript
 // User Entity
 interface User {
-  id: string;             // UUID
-  username: string;
-  email: string;
-  password: string;
-  walletAddress: string;
-  createdAt: Date;        // datetime
-  updatedAt: Date;        // datetime
+  id: string // UUID
+  username: string
+  email: string
+  password: string
+  walletAddress: string
+  createdAt: Date // datetime
+  updatedAt: Date // datetime
 }
 
-// Blog Post Entity
+// Blog Post Entity with JSON-based Rich Text Content
 interface BlogPost {
-  id: string;             // UUID
-  authorId: string;       // UUID
-  title: string;
-  content: string;        // text
-  createdAt: Date;        // datetime
-  updatedAt: Date;        // datetime
+  id: string // UUID
+  authorId: string // UUID
+  title: string
+  content: Record<string, any> // JSON object representing structured rich text content
+  createdAt: Date // datetime
+  updatedAt: Date // datetime
 }
 
 // Comment Entity
 interface Comment {
-  id: string;             // UUID
-  postId: string;         // UUID
-  authorId: string;       // UUID
-  content: string;
-  createdAt: Date;        // datetime
+  id: string // UUID
+  postId: string // UUID
+  authorId: string // UUID
+  content: string
+  createdAt: Date // datetime
 }
 
 // NFT Entity
 interface NFT {
-  id: string;             // UUID
-  ownerId: string;        // UUID
-  postId: string;         // UUID
-  mintedAt: Date;         // datetime
-  metadata: Record<string, any>;  // JSON
+  id: string // UUID
+  ownerId: string // UUID
+  postId: string // UUID
+  mintedAt: Date // datetime
+  metadata: Record<string, any> // JSON
 }
 
 // Notification Entity
 interface Notification {
-  id: string;             // UUID
-  userId: string;         // UUID
-  content: string;
-  createdAt: Date;        // datetime
+  id: string // UUID
+  userId: string // UUID
+  content: string
+  createdAt: Date // datetime
 }
-````
+```
 
 ## Endpoints
 
@@ -179,7 +184,7 @@ interface Notification {
     "email": "string",
     "password": "string"
   }
-   ```
+  ```
 
 - **Responses:**
   - `201 Created`: User successfully registered.
@@ -315,7 +320,7 @@ interface Notification {
         "id": "uuid",
         "authorId": "uuid",
         "title": "string",
-        "content": "text",
+        "content": "Record<string, any>", // JSON content
         "createdAt": "datetime",
         "updatedAt": "datetime"
       },
@@ -338,7 +343,7 @@ interface Notification {
       "id": "uuid",
       "authorId": "uuid",
       "title": "string",
-      "content": "text",
+      "content": "Record<string, any>", // JSON content
       "createdAt": "datetime",
       "updatedAt": "datetime"
     }
@@ -358,128 +363,10 @@ interface Notification {
   ```json
   {
     "title": "string",
-    "content": "text"
+    "content": "Record<string, any>" // JSON content
   }
   ```
 
 - **Responses:**
-  - `201 Created`: Blog post created successfully.
-    ```json
-    {
-      "id": "uuid",
-      "authorId": "uuid",
-      "title": "string",
-      "content": "text",
-      "createdAt": "datetime",
-      "updatedAt": "datetime"
-    }
-    ```
-  - `400 Bad Request`: Invalid input data.
-  - `401 Unauthorized`: Invalid or missing token.
-
-#### `PUT /posts/{id}`
-
-**Description:** Update a blog post (authenticated users only).
-
-- **Path Parameters:**
-
-  - `id: UUID`
-
-- **Request Headers:**
-
-  - `Authorization: Bearer <token>`
-
-- **Request Body:**
-
-  ```json
-  {
-    "title": "string",
-    "content": "text"
-  }
-  ```
-
-- **Responses:**
-  - `200 OK`: Blog post updated successfully.
-    ```json
-    {
-      "id": "uuid",
-      "authorId": "uuid",
-      "title": "string",
-      "content": "text",
-      "createdAt": "datetime",
-      "updatedAt": "datetime"
-    }
-    ```
-  - `400 Bad Request`: Invalid input data.
-  - `401 Unauthorized`: Invalid or missing token.
-  - `404 Not Found`: Blog post not found.
-
-#### `DELETE /posts/{id}`
-
-**Description:** Delete a blog post (authenticated users only).
-
-- **Path Parameters:**
-
-  - `id: UUID`
-
-- **Request Headers:**
-
-  - `Authorization: Bearer <token>`
-
-- **Responses:**
-  - `200 OK`: Blog post deleted successfully.
-  - `401 Unauthorized`: Invalid or missing token.
-  - `404 Not Found`: Blog post not found.
-
-### User Interaction API Endpoints
-
-#### `POST /posts/{id}/like`
-
-**Description:** Like a blog post (one like per user).
-
-- **Path Parameters:**
-
-  - `id: UUID`
-
-- **Request Headers:**
-
-  - `Authorization: Bearer <token>`
-
-- **Responses:**
-  - `200 OK`: Like registered successfully.
-  - `400 Bad Request`: Invalid post ID.
-  - `401 Unauthorized`: Invalid or missing token.
-  - `404 Not Found`: Blog post not found.
-
-#### `POST /posts/{id}/comment`
-
-**Description:** Add a comment to a blog post.
-
-- **Path Parameters:**
-
-  - `id: UUID`
-
-- **Request Headers:**
-
-  - `Authorization: Bearer <token>`
-
-- **Request Body:**
-
-  ```json
-  {
-    "content": "string"
-  }
-  ```
-
-- **Responses:**
-  - `201 Created`: Comment added successfully.
-    ```json
-    {
-      "id": "uuid",
-      "postId": "uuid",
-      "authorId": "uuid",
-      "content": "string",
-      "createdAt": "datetime"
-    }
-    ```
-  - `400 Bad Request`
+  - `
+````
