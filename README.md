@@ -179,7 +179,7 @@ interface Notification {
     "email": "string",
     "password": "string"
   }
-````
+   ```
 
 - **Responses:**
   - `201 Created`: User successfully registered.
@@ -482,4 +482,4 @@ interface Notification {
       "createdAt": "datetime"
     }
     ```
-  - `400 Bad Request
+  - `400 Bad Request`
