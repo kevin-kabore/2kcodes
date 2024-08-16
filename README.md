@@ -1,8 +1,3 @@
-Here is the updated design document including the decision to use Draft.js for
-JSON-based rich text content, along with the necessary changes to the entity
-model:
-
-````markdown
 # 1. Summary
 
 The project involves creating a personal website for Kevin Kaboré, consisting of
@@ -131,7 +126,7 @@ interface User {
   updatedAt: Date // datetime
 }
 
-// Blog Post Entity with JSON-based Rich Text Content
+// Blog Post Entity
 interface BlogPost {
   id: string // UUID
   authorId: string // UUID
@@ -368,5 +363,123 @@ interface Notification {
   ```
 
 - **Responses:**
-  - `
-````
+  - `201 Created`: Blog post created successfully.
+    ```json
+    {
+      "id": "uuid",
+      "authorId": "uuid",
+      "title": "string",
+      "content": "Record<string, any>", // JSON content
+      "createdAt": "datetime",
+      "updatedAt": "datetime"
+    }
+    ```
+  - `400 Bad Request`: Invalid input data.
+  - `401 Unauthorized`: Invalid or missing token.
+
+#### `PUT /posts/{id}`
+
+**Description:** Update a blog post (authenticated users only).
+
+- **Path Parameters:**
+
+  - `id: UUID`
+
+- **Request Headers:**
+
+  - `Authorization: Bearer <token>`
+
+- **Request Body:**
+
+  ```json
+  {
+    "title": "string",
+    "content": "Record<string, any>" // JSON content
+  }
+  ```
+
+- **Responses:**
+  - `200 OK`: Blog post updated successfully.
+    ```json
+    {
+      "id": "uuid",
+      "authorId": "uuid",
+      "title": "string",
+      "content": "Record<string, any>", // JSON content
+      "createdAt": "datetime",
+      "updatedAt": "datetime"
+    }
+    ```
+  - `400 Bad Request`: Invalid input data.
+  - `401 Unauthorized`: Invalid or missing token.
+  - `404 Not Found`: Blog post not found.
+
+#### `DELETE /posts/{id}`
+
+**Description:** Delete a blog post (authenticated users only).
+
+- **Path Parameters:**
+
+  - `id: UUID`
+
+- **Request Headers:**
+
+  - `Authorization: Bearer <token>`
+
+- **Responses:**
+  - `200 OK`: Blog post deleted successfully.
+  - `401 Unauthorized`: Invalid or missing token.
+  - `404 Not Found`: Blog post not found.
+
+### User Interaction API Endpoints
+
+#### `POST /posts/{id}/like`
+
+**Description:** Like a blog post (one like per user).
+
+- **Path Parameters:**
+
+  - `id: UUID`
+
+- **Request Headers:**
+
+  - `Authorization: Bearer <token>`
+
+- **Responses:**
+  - `200 OK`: Like registered successfully.
+  - `400 Bad Request`: Invalid post ID.
+  - `401 Unauthorized`: Invalid or missing token.
+  - `404 Not Found`: Blog post not found.
+
+#### `POST /posts/{id}/comment`
+
+**Description:** Add a comment to a blog post.
+
+- **Path Parameters:**
+
+  - `id: UUID`
+
+- **Request Headers:**
+
+  - `Authorization: Bearer <token>`
+
+- **Request Body:**
+
+  ```json
+  {
+    "content": "string"
+  }
+  ```
+
+- **Responses:**
+  - `201 Created`: Comment added successfully.
+    ```json
+    {
+      "id": "uuid",
+      "postId": "uuid",
+      "authorId": "uuid",
+      "content": "string",
+      "createdAt": "datetime"
+    }
+    ```
+  - `400 Bad Request`
