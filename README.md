@@ -161,7 +161,7 @@ interface Notification {
   content: string;
   createdAt: Date;        // datetime
 }
-```
+````
 
 ## Endpoints
 
