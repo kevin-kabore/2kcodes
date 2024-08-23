@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate-dev": "dotenv -e .env.local -- npx prisma migrate dev",
+    "prisma:seed": "dotenv -e .env.local -- npx ts-node --project tsconfig.prisma.json prisma/seed.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.13.1",
@@ -15,6 +17,8 @@
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
     "@mui/material-nextjs": "^5.16.6",
+    "@prisma/client": "^5.18.0",
+    "dotenv": "^16.4.5",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18"
@@ -25,6 +29,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
+    "prisma": "^5.18.0",
     "typescript": "^5"
   }
 }
