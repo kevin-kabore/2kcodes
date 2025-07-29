@@ -1,61 +1,51 @@
-'use client'
+'use client';
 
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 
 interface TextSlideshowProps {
-  prefix: string
-  items: string[]
+  prefix: string;
+  items: string[];
 }
 
-const TextSlideshow: React.FC<TextSlideshowProps> = ({prefix, items}) => {
-  const [displayText, setDisplayText] = useState('')
-  const [index, setIndex] = useState(0)
-  const [isDeleting, setIsDeleting] = useState(false)
+const TextSlideshow: React.FC<TextSlideshowProps> = ({ prefix, items }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
+
+  const getNextIndex = useCallback(() => {
+    return (currentIndex + 1) % items.length;
+  }, [currentIndex, items.length]);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout
-
-    const animateText = () => {
-      const currentItem = items[index]
-      if (!currentItem) return;
+    const interval = setInterval(() => {
+      setIsVisible(false);
       
-      if (!isDeleting) {
-        // Typing out the current item
-        if (displayText.length < currentItem.length) {
-          setDisplayText(
-            prevText => prevText + currentItem.charAt(prevText.length),
-          )
-        } else {
-          setIsDeleting(true) // Start deleting once text is fully typed
-          timeout = setTimeout(() => {
-            setIsDeleting(false) // Stop deleting after 1 second
-          }, 1000)
-        }
-      } else {
-        // Deleting the current item
-        if (displayText.length > 0) {
-          setDisplayText(prevText => prevText.slice(0, -1))
-        } else {
-          setIsDeleting(false) // Stop deleting once text is fully deleted
-          setIndex(prevIndex =>
-            prevIndex === items.length - 1 ? 0 : prevIndex + 1,
-          ) // Move to the next item
-        }
-      }
-    }
+      setTimeout(() => {
+        setCurrentIndex(getNextIndex());
+        setIsVisible(true);
+      }, 500);
+    }, 3000);
 
-    timeout = setTimeout(animateText, 100) // Start animation immediately
-
-    return () => clearTimeout(timeout) // Cleanup function
-  }, [index, items, displayText, isDeleting])
+    return () => clearInterval(interval);
+  }, [getNextIndex]);
 
   return (
-    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-center">
-      <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-        {prefix} <span className="slider">{displayText}</span>
-      </h2>
+    <div className="inline-block">
+      <span>{prefix} </span>
+      <motion.span
+        key={currentIndex}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ 
+          opacity: isVisible ? 1 : 0, 
+          y: isVisible ? 0 : -20 
+        }}
+        transition={{ duration: 0.5 }}
+        className="text-purple-400"
+      >
+        {items[currentIndex]}
+      </motion.span>
     </div>
-  )
-}
+  );
+};
 
-export default TextSlideshow
+export default TextSlideshow;

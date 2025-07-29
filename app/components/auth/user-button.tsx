@@ -1,25 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import {
-  IconButton,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  Avatar,
-  Box,
-  Typography,
-} from '@mui/material';
-import {
-  Person as PersonIcon,
-  Dashboard as DashboardIcon,
-  ExitToApp as LogoutIcon,
-  Settings as SettingsIcon,
-} from '@mui/icons-material';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface UserButtonProps {
   user: {
@@ -30,16 +14,19 @@ interface UserButtonProps {
 }
 
 export function UserButton({ user }: UserButtonProps) {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' });
@@ -57,65 +44,76 @@ export function UserButton({ user }: UserButtonProps) {
     return email?.[0]?.toUpperCase() || 'U';
   };
 
+  const menuItems = [
+    { href: '/dashboard', label: 'Dashboard', icon: '📊' },
+    { href: '/profile', label: 'Profile', icon: '👤' },
+    { href: '/settings', label: 'Settings', icon: '⚙️' },
+  ];
+
   return (
-    <>
-      <IconButton
-        onClick={handleClick}
-        size="small"
-        sx={{ ml: 2 }}
-        aria-controls={open ? 'account-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
       >
-        <Avatar
-          sx={{ width: 32, height: 32 }}
-          src={user.image || undefined}
-        >
-          {getInitials(user.name, user.email)}
-        </Avatar>
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        id="account-menu"
-        open={open}
-        onClose={handleClose}
-        onClick={handleClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-      >
-        <Box px={2} py={1}>
-          <Typography variant="subtitle2">{user.name || 'User'}</Typography>
-          <Typography variant="caption" color="text.secondary">
-            {user.email}
-          </Typography>
-        </Box>
-        <Divider />
-        <MenuItem component={Link} href="/dashboard">
-          <ListItemIcon>
-            <DashboardIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Dashboard</ListItemText>
-        </MenuItem>
-        <MenuItem component={Link} href="/profile">
-          <ListItemIcon>
-            <PersonIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Profile</ListItemText>
-        </MenuItem>
-        <MenuItem component={Link} href="/settings">
-          <ListItemIcon>
-            <SettingsIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Settings</ListItemText>
-        </MenuItem>
-        <Divider />
-        <MenuItem onClick={handleSignOut}>
-          <ListItemIcon>
-            <LogoutIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Sign out</ListItemText>
-        </MenuItem>
-      </Menu>
-    </>
+        {user.image ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={user.image}
+              alt={user.name || 'User'}
+              className="w-full h-full rounded-full object-cover"
+            />
+          </>
+        ) : (
+          <span className="text-sm font-medium">{getInitials(user.name, user.email)}</span>
+        )}
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+            transition={{ duration: 0.1 }}
+            className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5"
+          >
+            <div className="py-1">
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {user.name || 'User'}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  {user.email}
+                </p>
+              </div>
+
+              {menuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <span className="mr-3">{item.icon}</span>
+                  {item.label}
+                </Link>
+              ))}
+
+              <div className="border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <span className="mr-3">🚪</span>
+                  Sign out
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
