@@ -16,9 +16,11 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.7.2",
     "@emotion/cache": "^11.13.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@hookform/resolvers": "^3.9.1",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
     "@mui/material-nextjs": "^5.16.6",
@@ -26,8 +28,13 @@
     "argon2": "^0.41.1",
     "dotenv": "^16.4.5",
     "next": "14.2.5",
+    "next-auth": "5.0.0-beta.28",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-hook-form": "^7.54.2",
+    "server-only": "^0.0.1",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",

@@ -45,8 +45,7 @@
     "next-env.d.ts", 
     "**/*.ts", 
     "**/*.tsx", 
-    ".next/types/**/*.ts",
-    "env.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules", "dist", ".next", "out", "coverage"]
 }

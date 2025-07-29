@@ -10,18 +10,24 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("NEXT_DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String   @id @default(uuid())
-  username      String   @unique
-  email         String   @unique
+  id            String    @id @default(uuid())
+  username      String    @unique
+  email         String    @unique
   password      String
-  walletAddress String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  walletAddress String?
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   blogPosts     BlogPost[]
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
 
 model BlogPost {

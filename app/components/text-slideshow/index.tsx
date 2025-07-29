@@ -17,6 +17,8 @@ const TextSlideshow: React.FC<TextSlideshowProps> = ({prefix, items}) => {
 
     const animateText = () => {
       const currentItem = items[index]
+      if (!currentItem) return;
+      
       if (!isDeleting) {
         // Typing out the current item
         if (displayText.length < currentItem.length) {
