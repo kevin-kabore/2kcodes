@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { AuthSessionProvider } from './components/auth/session-provider';
 import { ThemeProvider } from './contexts/theme-context';
+import { DynamicProvider } from './components/providers/dynamic-provider';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -36,7 +37,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-white dark:bg-black text-gray-900 dark:text-gray-100`}>
         <AuthSessionProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <DynamicProvider>
+              {children}
+            </DynamicProvider>
+          </ThemeProvider>
         </AuthSessionProvider>
       </body>
     </html>

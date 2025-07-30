@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",
+    "@dynamic-labs/sdk-react-core": "^4.0.0",
+    "@dynamic-labs/solana": "^4.0.0",
     "@emotion/cache": "^11.13.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -25,6 +27,8 @@
     "@mui/material": "^5.16.7",
     "@mui/material-nextjs": "^5.16.6",
     "@prisma/client": "^5.18.0",
+    "@uiw/react-markdown-preview": "^5.1.5",
+    "@uiw/react-md-editor": "^4.0.8",
     "argon2": "^0.41.1",
     "dotenv": "^16.4.5",
     "framer-motion": "^12.23.11",
@@ -33,7 +37,10 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.54.2",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1",
     "server-only": "^0.0.1",
+    "slugify": "^1.6.6",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
   },
