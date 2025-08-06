@@ -1,20 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Static export configuration for GitHub Pages
-  ...(process.env.NEXT_PUBLIC_STATIC_EXPORT === 'true' && {
-    output: 'export',
-    basePath: '/2kcodes',
-    assetPrefix: '/2kcodes',
-  }),
-  
   reactStrictMode: true,
   poweredByHeader: false,
   
   // Images configuration
   images: {
-    // Disable image optimization for static export
-    unoptimized: process.env.NEXT_PUBLIC_STATIC_EXPORT === 'true',
-    domains: ['localhost', 'kevin-kabore.github.io'],
+    domains: ['localhost', 'vercel.app'],
     formats: ['image/avif', 'image/webp'],
   },
   
