@@ -17,7 +17,6 @@ A modern portfolio and blog platform built with Next.js 14, featuring authentica
 - Individual blog post pages
 - Blog post management (edit/delete)
 - Blog search and categories
-- Full static export support (currently requires server for auth routes)
 
 ## 🛠️ Tech Stack
 
@@ -74,8 +73,6 @@ A modern portfolio and blog platform built with Next.js 14, featuring authentica
    # Web3 (Optional)
    DYNAMIC_ENVIRONMENT_ID="your-dynamic-environment-id"
    
-   # Deployment
-   NEXT_PUBLIC_STATIC_EXPORT="false"  # Set "true" for GitHub Pages
    ```
 
 4. **Set up the database**
@@ -180,33 +177,47 @@ The app supports dark and light themes with:
 
 ## 🚀 Deployment
 
-### Option 1: Vercel (Recommended)
+### Vercel (Recommended)
 
-1. Push to GitHub
-2. Import to [Vercel](https://vercel.com)
-3. Add environment variables
-4. Deploy
+#### Quick Setup
+1. Import project at [vercel.com/new](https://vercel.com/new)
+2. Add environment variables (see below)
+3. Deploy!
 
-### Option 2: GitHub Pages (Static Export)
+#### Required Environment Variables
 
-> ⚠️ **Note**: Static export disables authentication, database features, and blog creation.
+```env
+# Database (Required)
+DATABASE_URL="postgresql://..."  # Use Vercel Postgres or external DB
 
-1. Set in `.env.production`:
-   ```env
-   NEXT_PUBLIC_STATIC_EXPORT=true
-   ```
+# Authentication (Required)
+NEXTAUTH_URL="https://your-app.vercel.app"
+NEXTAUTH_SECRET="..."  # Generate with: openssl rand -base64 32
 
-2. Configure GitHub Secrets:
-   - `NEXTAUTH_SECRET`
-   - `DYNAMIC_ENVIRONMENT_ID` (optional)
+# OAuth (Optional but recommended)
+GITHUB_ID="..."
+GITHUB_SECRET="..."
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
 
-3. Enable GitHub Pages:
-   - Settings → Pages → Deploy from branch
-   - Select `gh-pages` branch
+# Web3 (Optional)
+DYNAMIC_ENVIRONMENT_ID="..."
+```
 
-4. Push to main branch
+#### Post-Deployment Steps
 
-### Option 3: Self-Hosted
+1. **Database Setup**:
+   - If using Vercel Postgres: Storage → Create Database → Postgres
+   - Run migrations: Deploy hooks or manually via terminal
+
+2. **OAuth Configuration**:
+   - GitHub: Settings → Developer settings → OAuth Apps
+   - Google: [console.cloud.google.com](https://console.cloud.google.com)
+   - Callback URLs: `https://your-app.vercel.app/api/auth/callback/[provider]`
+
+3. **Update NEXTAUTH_URL** with your actual Vercel URL
+
+### Self-Hosted
 
 ```bash
 # Build
@@ -269,27 +280,7 @@ model BlogPost {
 | `GOOGLE_CLIENT_ID` | No | Google OAuth Client ID |
 | `GOOGLE_CLIENT_SECRET` | No | Google OAuth Client Secret |
 | `DYNAMIC_ENVIRONMENT_ID` | No | Dynamic.xyz environment ID |
-| `NEXT_PUBLIC_STATIC_EXPORT` | No | Enable static export mode |
 
-### Feature Flags
-
-Features are automatically enabled/disabled based on deployment type:
-
-```typescript
-// lib/config/deployment.ts
-export const deploymentConfig = {
-  isStaticExport: process.env.NEXT_PUBLIC_STATIC_EXPORT === 'true',
-  features: {
-    authentication: !isStaticExport,
-    blog: {
-      read: true,
-      write: !isStaticExport,
-    },
-    database: !isStaticExport,
-    web3: true,  // Client-side only
-  }
-}
-```
 
 ## 🐛 Known Issues
 
@@ -302,10 +293,6 @@ export const deploymentConfig = {
    - "Edit Profile" button non-functional
    - "Create Your First Post" not linked
 
-3. **Static Export**:
-   - Authentication features disabled
-   - Database operations unavailable
-   - Blog creation disabled
 
 ## 🤝 Contributing
 
