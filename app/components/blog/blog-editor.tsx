@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useCallback, useContext } from 'react'
+import { useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import slugify from 'slugify'
-import { ThemeContext } from '@/app/contexts/theme-context'
+import { useTheme } from '@/app/contexts/theme-context'
 import '@uiw/react-md-editor/markdown-editor.css'
 import '@uiw/react-markdown-preview/markdown.css'
 
@@ -30,7 +30,7 @@ type BlogPostFormData = z.infer<typeof blogPostSchema>
 
 export function BlogEditor({ postId }: { postId?: string }) {
   const router = useRouter()
-  const { theme } = useContext(ThemeContext)
+  const { theme } = useTheme()
   const [content, setContent] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewMode, setPreviewMode] = useState<'edit' | 'preview'>('edit')
@@ -39,7 +39,6 @@ export function BlogEditor({ postId }: { postId?: string }) {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
     watch,
   } = useForm<BlogPostFormData>({
     resolver: zodResolver(blogPostSchema),
