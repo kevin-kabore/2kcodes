@@ -37,9 +37,8 @@ async function main() {
         data: {
           authorId: user.id,
           title: 'Welcome to My Web3 Blog',
-          content: {
-            type: 'markdown',
-            text: `# Welcome to My Web3 Blog
+          slug: 'welcome-to-my-web3-blog',
+          content: `# Welcome to My Web3 Blog
 
 This is my first post on this decentralized blogging platform. Here's what makes it special:
 
@@ -49,7 +48,6 @@ This is my first post on this decentralized blogging platform. Here's what makes
 - **Tipping**: Support creators directly with crypto
 
 Stay tuned for more content about Web3, software engineering, and the future of decentralized applications!`,
-          },
           published: true,
         },
       }),
@@ -57,9 +55,8 @@ Stay tuned for more content about Web3, software engineering, and the future of 
         data: {
           authorId: user.id,
           title: 'Building with Next.js 15 and Web3',
-          content: {
-            type: 'markdown',
-            text: `# Building with Next.js 15 and Web3
+          slug: 'building-with-nextjs-15-and-web3',
+          content: `# Building with Next.js 15 and Web3
 
 In this post, I'll share my experience building this portfolio site with the latest tech stack:
 
@@ -83,7 +80,6 @@ const { connect } = useConnect();
 \`\`\`
 
 More technical posts coming soon!`,
-          },
           published: true,
         },
       }),
@@ -91,12 +87,10 @@ More technical posts coming soon!`,
         data: {
           authorId: user.id,
           title: 'Draft: The Future of Decentralized Publishing',
-          content: {
-            type: 'markdown',
-            text: `# The Future of Decentralized Publishing
+          slug: 'draft-future-of-decentralized-publishing',
+          content: `# The Future of Decentralized Publishing
 
 This is a draft post exploring ideas about decentralized content creation...`,
-          },
           published: false,
         },
       }),
