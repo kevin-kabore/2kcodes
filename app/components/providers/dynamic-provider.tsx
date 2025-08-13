@@ -6,7 +6,7 @@ import { SolanaWalletConnectors } from '@dynamic-labs/solana'
 export function DynamicProvider({ children }: { children: React.ReactNode }) {
   const environmentId = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID
 
-  if (!environmentId || process.env.NEXT_PUBLIC_ENABLE_WEB3 !== 'true') {
+  if (!environmentId) {
     return <>{children}</>
   }
 

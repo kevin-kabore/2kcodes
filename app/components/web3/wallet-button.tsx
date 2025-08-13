@@ -29,7 +29,7 @@ export function WalletButton() {
     }
   }, [primaryWallet, session, isSyncing])
 
-  if (!mounted || process.env.NEXT_PUBLIC_ENABLE_WEB3 !== 'true') {
+  if (!mounted) {
     return null
   }
 
