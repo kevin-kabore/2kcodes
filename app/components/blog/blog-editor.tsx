@@ -23,7 +23,7 @@ const blogPostSchema = z.object({
   categoryId: z.string().optional(),
   tags: z.string().optional(),
   coverImage: z.string().url().optional().or(z.literal('')),
-  published: z.boolean().default(false),
+  published: z.boolean(),
 })
 
 type BlogPostFormData = z.infer<typeof blogPostSchema>

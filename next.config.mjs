@@ -11,7 +11,7 @@ const nextConfig = {
   
   // Experimental features
   experimental: {
-    optimizePackageImports: ['@mui/material', '@mui/icons-material'],
+    // Package optimizations can be added here as needed
   },
   
   // Webpack config for client-side compatibility

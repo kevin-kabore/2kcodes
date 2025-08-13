@@ -3,8 +3,7 @@
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { Box, Typography, Paper, Container, Button, Grid } from '@mui/material'
-import { ExitToApp as LogoutIcon } from '@mui/icons-material'
+import Link from 'next/link'
 
 export function DashboardContent() {
   const { user, handleLogOut } = useDynamicContext()
@@ -18,86 +17,87 @@ export function DashboardContent() {
 
   if (!user) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Typography>Loading...</Typography>
-      </Container>
+      <div className="container mx-auto px-4 py-8">
+        <p>Loading...</p>
+      </div>
     )
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-        <Typography variant="h4" component="h1" fontWeight="bold">
-          Dashboard
-        </Typography>
-        <Button
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold">Dashboard</h1>
+        <button
           onClick={() => handleLogOut()}
-          variant="outlined"
-          startIcon={<LogoutIcon />}
+          className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors"
         >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
           Sign Out
-        </Button>
-      </Box>
+        </button>
+      </div>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="col-span-1 md:col-span-2">
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-2">
               Welcome back, {user.alias || user.email}!
-            </Typography>
-            <Typography variant="body1" color="text.secondary" paragraph>
+            </h2>
+            <p className="text-muted-foreground mb-6">
               You&apos;re successfully logged in to your account.
-            </Typography>
+            </p>
             
-            <Box mt={3}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">
                 Account Information:
-              </Typography>
-              <Typography variant="body2">
-                <strong>Email:</strong> {user.email || 'Not provided'}
-              </Typography>
-              {user.alias && (
-                <Typography variant="body2">
-                  <strong>Username:</strong> {user.alias}
-                </Typography>
-              )}
-              {user.verifiedCredentials?.[0]?.address && (
-                <Typography variant="body2">
-                  <strong>Wallet:</strong> {user.verifiedCredentials[0].address}
-                </Typography>
-              )}
-            </Box>
-          </Paper>
-        </Grid>
+              </h3>
+              <div className="space-y-2">
+                <p className="text-sm">
+                  <strong>Email:</strong> {user.email || 'Not provided'}
+                </p>
+                {user.alias && (
+                  <p className="text-sm">
+                    <strong>Username:</strong> {user.alias}
+                  </p>
+                )}
+                {user.verifiedCredentials?.[0]?.address && (
+                  <p className="text-sm">
+                    <strong>Wallet:</strong> {user.verifiedCredentials[0].address}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Your Blog Posts
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+        <div>
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-2">Your Blog Posts</h2>
+            <p className="text-sm text-muted-foreground mb-4">
               You haven&apos;t created any blog posts yet.
-            </Typography>
-            <Button variant="contained" sx={{ mt: 2 }}>
+            </p>
+            <Link 
+              href="/blog/write"
+              className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            >
               Create Your First Post
-            </Button>
-          </Paper>
-        </Grid>
+            </Link>
+          </div>
+        </div>
 
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Profile Settings
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+        <div>
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-2">Profile Settings</h2>
+            <p className="text-sm text-muted-foreground mb-4">
               Manage your account settings and preferences.
-            </Typography>
-            <Button variant="outlined" sx={{ mt: 2 }}>
+            </p>
+            <button className="inline-flex items-center px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors">
               Edit Profile
-            </Button>
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
