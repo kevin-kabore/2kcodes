@@ -1,10 +1,6 @@
-import { WalletButton } from '@/app/components/web3/wallet-button'
+import {WalletButton} from '@/app/components/web3/wallet-button'
 
-export default function BlogLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function BlogLayout({children}: {children: React.ReactNode}) {
   return (
     <div className="min-h-screen bg-background">
       <nav className="border-b border-border">

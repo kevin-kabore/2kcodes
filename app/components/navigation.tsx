@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeToggle } from './ui/theme-toggle';
-import { UserButton } from './auth/user-button';
 
 export function Navigation() {
-  const { data: session } = useSession();
+  const { user, setShowAuthFlow, handleLogOut } = useDynamicContext();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -63,15 +62,25 @@ export function Navigation() {
           <div className="flex items-center space-x-4">
             <ThemeToggle />
             
-            {session ? (
-              <UserButton user={session.user} />
+            {user ? (
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground">
+                  {user.alias || user.email || 'User'}
+                </span>
+                <button
+                  onClick={handleLogOut}
+                  className="px-4 py-2 text-sm border border-border rounded-md hover:bg-muted"
+                >
+                  Sign Out
+                </button>
+              </div>
             ) : (
-              <Link
-                href="/auth/signin"
+              <button
+                onClick={() => setShowAuthFlow(true)}
                 className="hidden md:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
               >
                 Sign In
-              </Link>
+              </button>
             )}
 
             {/* Mobile menu button */}
@@ -129,14 +138,26 @@ export function Navigation() {
                   {link.label}
                 </Link>
               ))}
-              {!session && (
-                <Link
-                  href="/auth/signin"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
+              {!user ? (
+                <button
+                  onClick={() => {
+                    setShowAuthFlow(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block px-3 py-2 rounded-md text-base font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors w-full text-left"
                 >
                   Sign In
-                </Link>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    handleLogOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors w-full text-left"
+                >
+                  Sign Out ({user.alias || user.email || 'User'})
+                </button>
               )}
             </div>
           </motion.div>

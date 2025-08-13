@@ -9,8 +9,8 @@ authentication, markdown blog editor, and Web3 integration.
 
 - **Portfolio Landing Page**: Hero section with animated text, About,
   Experience, Featured Posts, and Contact sections
-- **Authentication System**: Complete auth flow with NextAuth.js
-  (email/password + OAuth)
+- **Authentication System**: Complete auth flow with Dynamic Labs 
+  (wallet connection + social OAuth)
 - **Blog Editor**: Markdown editor with live preview for creating blog posts
 - **Dark/Light Theme**: System-aware theme switching with persistent preferences
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
@@ -31,7 +31,7 @@ authentication, markdown blog editor, and Web3 integration.
   [Material-UI](https://mui.com/)
 - **Database**: [PostgreSQL](https://www.postgresql.org/) +
   [Prisma ORM](https://www.prisma.io/)
-- **Authentication**: [NextAuth.js v5](https://authjs.dev/)
+- **Authentication**: [Dynamic Labs SDK](https://docs.dynamic.xyz/)
 - **Editor**: [@uiw/react-md-editor](https://github.com/uiwjs/react-md-editor)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **Web3**: [Dynamic](https://dynamic.xyz/)
@@ -174,17 +174,15 @@ Visit [http://localhost:3000](http://localhost:3000)
 2kcodes/
 ├── app/
 │   ├── api/              # API routes
-│   │   ├── auth/         # NextAuth.js endpoints
+│   │   ├── auth/         # Dynamic user sync endpoint
 │   │   ├── blog/         # Blog CRUD operations
 │   │   └── user/         # User operations (wallet sync)
-│   ├── auth/             # Authentication pages
 │   ├── blog/             # Blog pages
 │   ├── components/       # Reusable components
 │   ├── contexts/         # React contexts (theme)
 │   ├── dashboard/        # Protected user area
 │   └── (root pages)      # Landing page sections
 ├── lib/
-│   ├── auth/             # Auth configuration
 │   ├── config/           # App configuration
 │   └── db.ts             # Database client
 ├── prisma/
@@ -233,16 +231,18 @@ npm run type-check   # Run TypeScript compiler check
 
 ## 🔐 Authentication
 
-The app uses NextAuth.js v5 with multiple providers:
+The app uses Dynamic Labs SDK for authentication:
 
-- **Credentials**: Email/password with argon2 hashing
-- **OAuth**: GitHub and Google (configure in `.env.local`)
+- **Wallet Connection**: Connect with various Web3 wallets
+- **Social OAuth**: Google authentication 
+- **User Management**: Automatic user sync with database
 
-Protected routes:
+Authentication features:
 
-- `/dashboard` - User dashboard
-- `/blog/write` - Create blog posts
-- `/admin/*` - Admin area (role-based)
+- Dynamic wallet connection
+- Social login integration
+- User session management
+- Protected blog post creation
 
 ## 📝 Blog System
 
@@ -310,9 +310,8 @@ DYNAMIC_ENVIRONMENT_ID="..."
 
    - GitHub: Settings → Developer settings → OAuth Apps
    - Google: [console.cloud.google.com](https://console.cloud.google.com)
-   - Callback URLs: `https://your-app.vercel.app/api/auth/callback/[provider]`
 
-3. **Update NEXTAUTH_URL** with your actual Vercel URL
+3. **Configure Dynamic Environment ID** with your production environment
 
 ### Self-Hosted
 

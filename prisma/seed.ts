@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import * as argon2 from 'argon2';
 
 const prisma = new PrismaClient();
 
@@ -18,15 +17,14 @@ async function main() {
     await prisma.user.deleteMany();
     console.log('✅ Cleared existing data');
 
-    // Create test user with hashed password
-    const hashedPassword = await argon2.hash('testpassword123');
-    
+    // Create test user (Dynamic auth pattern - no password needed)
     const user = await prisma.user.create({
       data: {
+        id: '01234567-8901-2345-6789-abcdef012345', // Dynamic userId format
         username: 'kevinkabore',
         email: 'kevin@example.com',
-        password: hashedPassword,
-        walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f5b899',
+        password: null, // No password for Dynamic auth
+        walletAddress: 'So11111111111111111111111111111111111111112', // Solana wallet format
       },
     });
     console.log('✅ Created user:', user.username);
@@ -38,45 +36,44 @@ async function main() {
           authorId: user.id,
           title: 'Welcome to My Web3 Blog',
           slug: 'welcome-to-my-web3-blog',
-          content: `# Welcome to My Web3 Blog
+          content: `# Welcome to My Blog
 
-This is my first post on this decentralized blogging platform. Here's what makes it special:
+This is my first post on this modern blogging platform. Here's what makes it special:
 
-- **Decentralized Content**: Posts are stored on IPFS
-- **NFT Integration**: Each post can be minted as an NFT
-- **Wallet Authentication**: Login with your Web3 wallet
-- **Tipping**: Support creators directly with crypto
+- **Modern Authentication**: Login with your Web3 wallet or Google account via Dynamic
+- **Developer-Friendly**: Built with Next.js 14, TypeScript, and Prisma
+- **Responsive Design**: Works perfectly on all devices
+- **Fast Performance**: Optimized with server components and edge runtime
 
-Stay tuned for more content about Web3, software engineering, and the future of decentralized applications!`,
+Stay tuned for more content about Web3, software engineering, and modern web development!`,
           published: true,
         },
       }),
       prisma.blogPost.create({
         data: {
           authorId: user.id,
-          title: 'Building with Next.js 15 and Web3',
-          slug: 'building-with-nextjs-15-and-web3',
-          content: `# Building with Next.js 15 and Web3
+          title: 'Building with Next.js 14 and Dynamic Auth',
+          slug: 'building-with-nextjs-14-and-dynamic-auth',
+          content: `# Building with Next.js 14 and Dynamic Auth
 
 In this post, I'll share my experience building this portfolio site with the latest tech stack:
 
 ## Tech Stack
-- **Next.js 15**: The latest version with App Router
+- **Next.js 14**: App Router with server components
 - **TypeScript**: For type safety
 - **Prisma**: Type-safe database ORM
 - **Tailwind CSS**: For styling
-- **Wagmi + Viem**: Modern Web3 libraries
+- **Dynamic Labs**: Modern Web3 and social authentication
 
 ## Key Features
 1. Server Components for better performance
-2. Edge Runtime support
+2. Client-side authentication with Dynamic
 3. Built-in SEO optimization
-4. Progressive Web App capabilities
+4. Hybrid authentication (wallet + social)
 
 \`\`\`typescript
-// Example of a Web3 hook
-const { address, isConnected } = useAccount();
-const { connect } = useConnect();
+// Example of Dynamic auth usage
+const { user, primaryWallet, setShowAuthFlow } = useDynamicContext();
 \`\`\`
 
 More technical posts coming soon!`,
