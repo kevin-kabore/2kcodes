@@ -14,10 +14,10 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
+  id            String    @id // Dynamic userId (not auto-generated)
   username      String    @unique
-  email         String    @unique
-  password      String
+  email         String?   @unique // Optional since wallet-only auth may not have email
+  password      String?   // Optional since we use Dynamic auth
   walletAddress String?
   role          UserRole  @default(USER)
   createdAt     DateTime  @default(now())

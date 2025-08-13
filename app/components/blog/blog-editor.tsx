@@ -23,7 +23,7 @@ const blogPostSchema = z.object({
   categoryId: z.string().optional(),
   tags: z.string().optional(),
   coverImage: z.string().url().optional().or(z.literal('')),
-  published: z.boolean().default(false),
+  published: z.boolean(),
 })
 
 type BlogPostFormData = z.infer<typeof blogPostSchema>
@@ -77,7 +77,11 @@ export function BlogEditor({ postId }: { postId?: string }) {
       }
 
       const savedPost = await response.json()
-      router.push(`/blog/${savedPost.slug}`)
+      
+      // Show success message and redirect to blog listing for now
+      // TODO: Redirect to individual post page when implemented
+      alert(`Blog post "${savedPost.title}" ${data.published ? 'published' : 'saved as draft'} successfully!`)
+      router.push('/blog')
     } catch (error) {
       console.error('Error saving blog post:', error)
       alert('Failed to save blog post. Please try again.')

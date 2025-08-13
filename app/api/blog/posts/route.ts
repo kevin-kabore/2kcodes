@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 
@@ -12,20 +11,25 @@ const createPostSchema = z.object({
   categoryId: z.string().optional().nullable(),
   tags: z.array(z.string()).optional(),
   published: z.boolean().default(false),
+  userId: z.string().min(1), // Dynamic user ID
 })
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const body = await req.json()
+    const validatedData = createPostSchema.parse(body)
+    
+    // Verify user exists
+    const user = await db.user.findUnique({
+      where: { id: validatedData.userId }
+    })
+    
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
-
-    const body = await req.json()
-    const validatedData = createPostSchema.parse(body)
 
     // Check if slug already exists
     const existingPost = await db.blogPost.findUnique({
@@ -66,7 +70,7 @@ export async function POST(req: NextRequest) {
         coverImage: validatedData.coverImage,
         published: validatedData.published,
         publishedAt: validatedData.published ? new Date() : null,
-        authorId: session.user.id,
+        authorId: validatedData.userId,
         categoryId: validatedData.categoryId,
         tags: {
           connect: tagRecords.map(tag => ({ id: tag.id })),
