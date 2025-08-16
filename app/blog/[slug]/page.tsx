@@ -148,13 +148,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
 // Generate static params for better performance
 export async function generateStaticParams() {
-  const posts = await db.blogPost.findMany({
-    where: { published: true },
-    select: { slug: true },
-    take: 100, // Limit for build performance
-  })
+  try {
+    const posts = await db.blogPost.findMany({
+      where: { published: true },
+      select: { slug: true },
+      take: 100, // Limit for build performance
+    })
 
-  return posts.map((post) => ({
-    slug: post.slug,
-  }))
+    return posts.map((post) => ({
+      slug: post.slug,
+    }))
+  } catch (error) {
+    // If database is not available during build, return empty array
+    // Pages will be generated on-demand instead
+    console.warn('Database not available during build, using ISR for blog posts')
+    return []
+  }
 }
