@@ -19,9 +19,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setMounted(true);
     // Get theme from localStorage or system preference
     const savedTheme = localStorage.getItem('theme') as Theme | null;
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     
-    const initialTheme = savedTheme || systemTheme;
+    const initialTheme = savedTheme || 'dark';
     setTheme(initialTheme);
     
     // Apply theme to document
