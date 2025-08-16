@@ -79,7 +79,7 @@ export function NFTCollection({ nfts }: NFTCollectionProps) {
           <div className="text-6xl mb-4">🎨</div>
           <h3 className="text-xl font-semibold mb-2">No NFTs Found</h3>
           <p className="text-muted-foreground mb-4">
-            This wallet hasn't minted any blog post NFTs yet.
+            This wallet hasn&apos;t minted any blog post NFTs yet.
           </p>
           <Link
             href="/blog/write"

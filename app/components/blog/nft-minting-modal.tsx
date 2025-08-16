@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useNFTMinting } from '@/hooks/use-nft-minting'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
 
@@ -114,9 +115,11 @@ export function NFTMintingModal({ isOpen, onClose, blogPost, onMintSuccess }: NF
                   </p>
                 )}
                 {blogPost.coverImage && (
-                  <img
+                  <Image
                     src={blogPost.coverImage}
                     alt={blogPost.title}
+                    width={400}
+                    height={128}
                     className="w-full h-32 object-cover rounded mt-2"
                   />
                 )}

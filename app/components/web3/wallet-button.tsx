@@ -1,7 +1,7 @@
 'use client'
 
 import {useDynamicContext} from '@dynamic-labs/sdk-react-core'
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useCallback} from 'react'
 
 interface WalletButtonProps {
   showNetwork?: boolean
@@ -23,13 +23,7 @@ export function WalletButton({
     setMounted(true)
   }, [])
 
-  useEffect(() => {
-    if (primaryWallet && showBalance) {
-      fetchBalance()
-    }
-  }, [primaryWallet, showBalance])
-
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!primaryWallet) return
     
     setIsLoadingBalance(true)
@@ -49,7 +43,13 @@ export function WalletButton({
     } finally {
       setIsLoadingBalance(false)
     }
-  }
+  }, [primaryWallet])
+
+  useEffect(() => {
+    if (primaryWallet && showBalance) {
+      fetchBalance()
+    }
+  }, [primaryWallet, showBalance, fetchBalance])
 
   const getNetworkDisplayName = (networkName?: string) => {
     switch (networkName?.toLowerCase()) {
