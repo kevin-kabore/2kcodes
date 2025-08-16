@@ -1,19 +1,19 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import {useState, useCallback} from 'react'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import {useRouter} from 'next/navigation'
+import {useForm} from 'react-hook-form'
+import {zodResolver} from '@hookform/resolvers/zod'
+import {z} from 'zod'
 import slugify from 'slugify'
-import { useTheme } from '@/app/contexts/theme-context'
+import {useTheme} from '@/app/contexts/theme-context'
 import '@uiw/react-md-editor/markdown-editor.css'
 import '@uiw/react-markdown-preview/markdown.css'
 
 const MDEditor = dynamic(
-  () => import('@uiw/react-md-editor').then((mod) => mod.default),
-  { ssr: false }
+  () => import('@uiw/react-md-editor').then(mod => mod.default),
+  {ssr: false},
 )
 
 const blogPostSchema = z.object({
@@ -28,34 +28,41 @@ const blogPostSchema = z.object({
 
 type BlogPostFormData = z.infer<typeof blogPostSchema>
 
-export function BlogEditor({ postId }: { postId?: string }) {
+export function BlogEditor({postId, userId}: {postId?: string; userId?: string}) {
   const router = useRouter()
-  const { theme } = useTheme()
-  const [content, setContent] = useState<string>('')
+  const {theme} = useTheme()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewMode, setPreviewMode] = useState<'edit' | 'preview'>('edit')
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: {errors},
     watch,
+    setValue,
+    trigger,
   } = useForm<BlogPostFormData>({
     resolver: zodResolver(blogPostSchema),
     defaultValues: {
       published: false,
+      content: '',
     },
   })
 
   const watchTitle = watch('title')
   const generateSlug = useCallback(() => {
     if (watchTitle) {
-      return slugify(watchTitle, { lower: true, strict: true })
+      return slugify(watchTitle, {lower: true, strict: true})
     }
     return ''
   }, [watchTitle])
 
   const onSubmit = async (data: BlogPostFormData) => {
+    if (!userId) {
+      alert('You must be logged in to create a blog post.')
+      return
+    }
+
     setIsSubmitting(true)
     try {
       const slug = generateSlug()
@@ -66,9 +73,13 @@ export function BlogEditor({ postId }: { postId?: string }) {
         },
         body: JSON.stringify({
           ...data,
-          content,
           slug,
-          tags: data.tags?.split(',').map(tag => tag.trim()).filter(Boolean),
+          userId,
+          coverImage: data.coverImage || null,
+          tags: data.tags
+            ?.split(',')
+            .map(tag => tag.trim())
+            .filter(Boolean),
         }),
       })
 
@@ -77,10 +88,14 @@ export function BlogEditor({ postId }: { postId?: string }) {
       }
 
       const savedPost = await response.json()
-      
+
       // Show success message and redirect to blog listing for now
       // TODO: Redirect to individual post page when implemented
-      alert(`Blog post "${savedPost.title}" ${data.published ? 'published' : 'saved as draft'} successfully!`)
+      alert(
+        `Blog post "${savedPost.title}" ${
+          data.published ? 'published' : 'saved as draft'
+        } successfully!`,
+      )
       router.push('/blog')
     } catch (error) {
       console.error('Error saving blog post:', error)
@@ -104,7 +119,9 @@ export function BlogEditor({ postId }: { postId?: string }) {
           placeholder="Enter your blog post title"
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-destructive">{errors.title.message}</p>
+          <p className="mt-1 text-sm text-destructive">
+            {errors.title.message}
+          </p>
         )}
       </div>
 
@@ -120,7 +137,9 @@ export function BlogEditor({ postId }: { postId?: string }) {
           placeholder="Brief description of your post"
         />
         {errors.excerpt && (
-          <p className="mt-1 text-sm text-destructive">{errors.excerpt.message}</p>
+          <p className="mt-1 text-sm text-destructive">
+            {errors.excerpt.message}
+          </p>
         )}
       </div>
 
@@ -136,7 +155,9 @@ export function BlogEditor({ postId }: { postId?: string }) {
           placeholder="https://example.com/image.jpg"
         />
         {errors.coverImage && (
-          <p className="mt-1 text-sm text-destructive">{errors.coverImage.message}</p>
+          <p className="mt-1 text-sm text-destructive">
+            {errors.coverImage.message}
+          </p>
         )}
       </div>
 
@@ -155,9 +176,7 @@ export function BlogEditor({ postId }: { postId?: string }) {
 
       <div>
         <div className="flex justify-between items-center mb-2">
-          <label className="block text-sm font-medium">
-            Content
-          </label>
+          <label className="block text-sm font-medium">Content</label>
           <div className="flex gap-2">
             <button
               type="button"
@@ -185,14 +204,20 @@ export function BlogEditor({ postId }: { postId?: string }) {
         </div>
         <div data-color-mode={theme === 'dark' ? 'dark' : 'light'}>
           <MDEditor
-            value={content}
-            onChange={(val) => setContent(val || '')}
+            value={watch('content')}
+            onChange={val => {
+              const newContent = val || ''
+              setValue('content', newContent)
+              trigger('content')
+            }}
             preview={previewMode}
             height={400}
           />
         </div>
         {errors.content && (
-          <p className="mt-1 text-sm text-destructive">{errors.content.message}</p>
+          <p className="mt-1 text-sm text-destructive">
+            {errors.content.message}
+          </p>
         )}
       </div>
 

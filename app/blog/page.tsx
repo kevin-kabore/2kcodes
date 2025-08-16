@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
+import {useDynamicContext} from '@dynamic-labs/sdk-react-core'
 
 export default function BlogPage() {
-  const { user, setShowAuthFlow } = useDynamicContext()
+  const {user, setShowAuthFlow} = useDynamicContext()
 
   console.log('Dynamic user:', user)
   return (
