@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeToggle } from './ui/theme-toggle';
+import { WalletButton } from './web3/wallet-button';
 
 export function Navigation() {
   const { user, setShowAuthFlow, handleLogOut } = useDynamicContext();
@@ -62,8 +63,19 @@ export function Navigation() {
           <div className="flex items-center space-x-4">
             <ThemeToggle />
             
+            {/* Wallet Connection */}
+            <div className="hidden md:block">
+              <WalletButton showNetwork={true} showBalance={false} variant="compact" />
+            </div>
+            
             {user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/profile"
+                  className="px-3 py-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                >
+                  Profile
+                </Link>
                 <span className="text-sm text-muted-foreground">
                   {user.alias || user.email || 'User'}
                 </span>
@@ -138,6 +150,11 @@ export function Navigation() {
                   {link.label}
                 </Link>
               ))}
+              
+              {/* Mobile Wallet Connection */}
+              <div className="px-3 py-2">
+                <WalletButton showNetwork={true} showBalance={true} variant="default" />
+              </div>
               {!user ? (
                 <button
                   onClick={() => {
@@ -149,15 +166,24 @@ export function Navigation() {
                   Sign In
                 </button>
               ) : (
-                <button
-                  onClick={() => {
-                    handleLogOut();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors w-full text-left"
-                >
-                  Sign Out ({user.alias || user.email || 'User'})
-                </button>
+                <div className="space-y-1">
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors w-full text-left"
+                  >
+                    Sign Out ({user.alias || user.email || 'User'})
+                  </button>
+                </div>
               )}
             </div>
           </motion.div>

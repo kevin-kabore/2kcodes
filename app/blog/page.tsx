@@ -28,39 +28,55 @@ interface BlogPost {
   viewCount: number
   createdAt: string
   updatedAt: string
+  // Web3/NFT fields
+  nftMinted: boolean
+  nftMintAddress?: string | null
+  nftMetadataUri?: string | null
+  nftNetwork?: string | null
+  nftTxSignature?: string | null
+  nftMintedAt?: string | null
+  nftRoyalty?: number | null
 }
 
 export default async function BlogPage() {
-  const posts = await db.blogPost.findMany({
-    where: {
-      published: true,
-    },
-    include: {
-      author: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-        },
+  let posts: BlogPost[] = []
+  
+  try {
+    const dbPosts = await db.blogPost.findMany({
+      where: {
+        published: true,
       },
-      tags: true,
-      category: true,
-    },
-    orderBy: {
-      publishedAt: 'desc',
-    },
-  })
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+        tags: true,
+        category: true,
+      },
+      orderBy: {
+        publishedAt: 'desc',
+      },
+    })
 
-  const transformedPosts: BlogPost[] = posts.map(post => ({
-    ...post,
-    publishedAt: post.publishedAt?.toISOString() || null,
-    createdAt: post.createdAt.toISOString(),
-    updatedAt: post.updatedAt.toISOString(),
-  }))
+    posts = dbPosts.map(post => ({
+      ...post,
+      publishedAt: post.publishedAt?.toISOString() || null,
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+      nftMintedAt: post.nftMintedAt?.toISOString() || null,
+    }))
+  } catch (error) {
+    console.log('Database not available during build time, using empty posts array')
+    posts = []
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <BlogListClient posts={transformedPosts} />
+      <BlogListClient posts={posts} />
     </div>
   )
 }

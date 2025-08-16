@@ -8,6 +8,8 @@ import {zodResolver} from '@hookform/resolvers/zod'
 import {z} from 'zod'
 import slugify from 'slugify'
 import {useTheme} from '@/app/contexts/theme-context'
+import {useDynamicContext} from '@dynamic-labs/sdk-react-core'
+import {NFTMintingModal} from './nft-minting-modal'
 import '@uiw/react-md-editor/markdown-editor.css'
 import '@uiw/react-markdown-preview/markdown.css'
 
@@ -31,8 +33,12 @@ type BlogPostFormData = z.infer<typeof blogPostSchema>
 export function BlogEditor({postId, userId}: {postId?: string; userId?: string}) {
   const router = useRouter()
   const {theme} = useTheme()
+  const {primaryWallet} = useDynamicContext()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewMode, setPreviewMode] = useState<'edit' | 'preview'>('edit')
+  const [showNFTModal, setShowNFTModal] = useState(false)
+  const [savedPost, setSavedPost] = useState<any>(null)
+  const [shouldMintNFT, setShouldMintNFT] = useState(false)
 
   const {
     register,
@@ -88,15 +94,20 @@ export function BlogEditor({postId, userId}: {postId?: string; userId?: string})
       }
 
       const savedPost = await response.json()
+      setSavedPost(savedPost)
 
-      // Show success message and redirect to blog listing for now
-      // TODO: Redirect to individual post page when implemented
-      alert(
-        `Blog post "${savedPost.title}" ${
-          data.published ? 'published' : 'saved as draft'
-        } successfully!`,
-      )
-      router.push('/blog')
+      // If NFT minting is requested and wallet is connected, show NFT modal
+      if (shouldMintNFT && primaryWallet && data.published) {
+        setShowNFTModal(true)
+      } else {
+        // Show success message and redirect to blog listing
+        alert(
+          `Blog post "${savedPost.title}" ${
+            data.published ? 'published' : 'saved as draft'
+          } successfully!`,
+        )
+        router.push('/blog')
+      }
     } catch (error) {
       console.error('Error saving blog post:', error)
       alert('Failed to save blog post. Please try again.')
@@ -232,6 +243,33 @@ export function BlogEditor({postId, userId}: {postId?: string; userId?: string})
         </label>
       </div>
 
+      {/* NFT Minting Option */}
+      {primaryWallet && (
+        <div className="border border-border rounded-lg p-4 bg-muted/50">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">🎨</span>
+            <h3 className="font-medium">NFT Minting</h3>
+          </div>
+          <p className="text-sm text-muted-foreground mb-3">
+            Mint your blog post as an NFT on Solana after publishing
+          </p>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={shouldMintNFT}
+              onChange={(e) => setShouldMintNFT(e.target.checked)}
+              className="rounded border-border"
+            />
+            <span className="text-sm">Mint as NFT after publishing</span>
+          </label>
+          {shouldMintNFT && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Note: You can only mint published posts as NFTs. Ensure your wallet is connected to Solana.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="flex gap-4">
         <button
           type="submit"
@@ -248,6 +286,51 @@ export function BlogEditor({postId, userId}: {postId?: string; userId?: string})
           Cancel
         </button>
       </div>
+
+      {/* NFT Minting Modal */}
+      {savedPost && (
+        <NFTMintingModal
+          isOpen={showNFTModal}
+          onClose={() => {
+            setShowNFTModal(false)
+            setSavedPost(null)
+            router.push('/blog')
+          }}
+          blogPost={{
+            id: savedPost.id,
+            title: savedPost.title,
+            excerpt: savedPost.excerpt,
+            content: savedPost.content,
+            slug: savedPost.slug,
+            authorId: savedPost.authorId,
+            coverImage: savedPost.coverImage,
+          }}
+          onMintSuccess={async (result) => {
+            // Update the blog post with NFT information
+            try {
+              await fetch(`/api/blog/posts/${savedPost.id}/nft`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  nftMinted: true,
+                  nftMintAddress: result.mintAddress,
+                  nftMetadataUri: result.metadataUri,
+                  nftTxSignature: result.txSignature,
+                  nftNetwork: 'devnet', // This should be dynamic based on the network used
+                  nftMintedAt: new Date().toISOString(),
+                }),
+              })
+              
+              alert(`Blog post "${savedPost.title}" published and minted as NFT successfully! 🎉`)
+            } catch (error) {
+              console.error('Failed to update NFT information:', error)
+              alert('NFT minted successfully, but failed to update database. Please contact support.')
+            }
+          }}
+        />
+      )}
     </form>
   )
 }

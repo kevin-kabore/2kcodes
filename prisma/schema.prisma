@@ -47,9 +47,20 @@ model BlogPost {
   viewCount   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  // Web3/NFT fields
+  nftMinted   Boolean  @default(false)
+  nftMintAddress String? // Solana NFT mint address
+  nftMetadataUri String? // IPFS/Arweave URI for NFT metadata
+  nftNetwork  String?  // e.g., "mainnet", "devnet", "testnet"
+  nftTxSignature String? // Transaction signature of the mint
+  nftMintedAt DateTime? // When the NFT was minted
+  nftRoyalty  Int?     @default(500) // Royalty percentage in basis points (500 = 5%)
 
   @@index([slug])
   @@index([published, publishedAt])
+  @@index([nftMinted])
+  @@index([nftMintAddress])
 }
 
 model Category {
