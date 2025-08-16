@@ -31,6 +31,14 @@ interface BlogPost {
   viewCount: number
   createdAt: string
   updatedAt: string
+  // Web3/NFT fields
+  nftMinted: boolean
+  nftMintAddress?: string | null
+  nftMetadataUri?: string | null
+  nftNetwork?: string | null
+  nftTxSignature?: string | null
+  nftMintedAt?: string | null
+  nftRoyalty?: number | null
 }
 
 interface BlogPostCardProps {
@@ -73,6 +81,20 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
             </>
           )}
         </div>
+
+        {/* NFT Badge */}
+        {post.nftMinted && (
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-medium rounded-full">
+              🎨 NFT
+            </span>
+            {post.nftNetwork && (
+              <span className="text-xs text-muted-foreground">
+                on {post.nftNetwork}
+              </span>
+            )}
+          </div>
+        )}
 
         <h2 className="text-xl font-semibold">
           <Link 

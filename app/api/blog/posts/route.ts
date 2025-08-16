@@ -17,16 +17,22 @@ const createPostSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
+    console.log('Received blog post data:', body)
+    
     const validatedData = createPostSchema.parse(body)
+    console.log('Validated data:', validatedData)
     
     // Verify user exists
     const user = await db.user.findUnique({
       where: { id: validatedData.userId }
     })
     
+    console.log('Found user in database:', user ? { id: user.id, username: user.username } : 'null')
+    
     if (!user) {
+      console.log('User not found in database with ID:', validatedData.userId)
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized - User not found in database' },
         { status: 401 }
       )
     }

@@ -14,9 +14,13 @@ const nextConfig = {
     // Package optimizations can be added here as needed
   },
   
-  // Webpack config for client-side compatibility
+  // Standard webpack config for Node.js polyfills
   webpack: (config) => {
-    config.resolve.fallback = { fs: false, net: false, tls: false };
+    config.resolve.fallback = {
+      fs: false,
+      net: false,
+      tls: false,
+    };
     return config;
   },
 };

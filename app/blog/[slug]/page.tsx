@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import Image from 'next/image'
-import { BlogPostActions } from './blog-post-actions'
+import { BlogPostClient } from './blog-post-client'
 import { MarkdownContent } from './markdown-content'
 
 interface BlogPostPageProps {
@@ -13,32 +13,38 @@ interface BlogPostPageProps {
 }
 
 async function getBlogPost(slug: string) {
-  const post = await db.blogPost.findUnique({
-    where: { slug },
-    include: {
-      author: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
+  try {
+    const post = await db.blogPost.findUnique({
+      where: { slug },
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
         },
+        tags: true,
+        category: true,
       },
-      tags: true,
-      category: true,
-    },
-  })
+      // All NFT fields are automatically included since they're part of the BlogPost model
+    })
 
-  if (!post) {
+    if (!post) {
+      return null
+    }
+
+    // Increment view count
+    await db.blogPost.update({
+      where: { id: post.id },
+      data: { viewCount: { increment: 1 } },
+    })
+
+    return post
+  } catch (error) {
+    console.log('Database not available, returning null for blog post')
     return null
   }
-
-  // Increment view count
-  await db.blogPost.update({
-    where: { id: post.id },
-    data: { viewCount: { increment: 1 } },
-  })
-
-  return post
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
@@ -115,6 +121,76 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
           </div>
 
+          {/* NFT Metadata */}
+          {post.nftMinted && (
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium rounded-full">
+                  🎨 NFT Collectible
+                </span>
+                {post.nftNetwork && (
+                  <span className="text-sm text-muted-foreground">
+                    on {post.nftNetwork}
+                  </span>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                {post.nftMintAddress && (
+                  <div>
+                    <span className="font-medium text-foreground">Mint Address:</span>
+                    <p className="text-muted-foreground font-mono text-xs break-all">
+                      {post.nftMintAddress}
+                    </p>
+                  </div>
+                )}
+                
+                {post.nftTxSignature && (
+                  <div>
+                    <span className="font-medium text-foreground">Transaction:</span>
+                    <p className="text-muted-foreground font-mono text-xs break-all">
+                      {post.nftTxSignature}
+                    </p>
+                  </div>
+                )}
+                
+                {post.nftMintedAt && (
+                  <div>
+                    <span className="font-medium text-foreground">Minted:</span>
+                    <p className="text-muted-foreground">
+                      {format(new Date(post.nftMintedAt), 'MMMM d, yyyy \'at\' h:mm a')}
+                    </p>
+                  </div>
+                )}
+                
+                {post.nftRoyalty && (
+                  <div>
+                    <span className="font-medium text-foreground">Royalty:</span>
+                    <p className="text-muted-foreground">
+                      {(post.nftRoyalty / 100).toFixed(1)}%
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              {post.nftMetadataUri && (
+                <div className="mt-3 pt-3 border-t border-purple-200 dark:border-purple-800">
+                  <a
+                    href={post.nftMetadataUri}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
+                  >
+                    📄 View NFT Metadata
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Tags */}
           {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
@@ -134,7 +210,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <MarkdownContent content={post.content} />
 
         {/* Author Actions - Client Component */}
-        <BlogPostActions authorId={post.authorId} slug={post.slug} />
+        <BlogPostClient authorId={post.authorId} slug={post.slug} />
 
         {/* Related Posts */}
         {/* TODO: Implement related posts based on tags or category */}

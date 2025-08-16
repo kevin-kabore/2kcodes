@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma migrate deploy && prisma generate && next build",
+    "build": "prisma generate && next build",
+    "vercel-build": "npm run build && npm run db:migrate:deploy",
+    "db:migrate:deploy": "if [ \"$VERCEL_ENV\" = \"production\" ]; then prisma migrate deploy; else echo 'Skipping migrations in non-production environment'; fi",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -16,7 +18,7 @@
     "db:push": "dotenv -e .env.local -- prisma db push",
     "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
     "db:migrate:name": "dotenv -e .env.local -- prisma migrate dev --name",
-    "db:migrate:prod": "dotenv -e .env.local -- prisma migrate deploy",
+    "db:migrate:prod": "prisma migrate deploy",
     "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts",
     "db:studio": "dotenv -e .env.local -- prisma studio",
     "db:reset": "dotenv -e .env.local -- prisma migrate reset",
@@ -68,5 +70,9 @@
     "tailwindcss": "^3.4.4",
     "tsx": "^4.16.2",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@metaplex-foundation/umi": "^1.2.0",
+    "viem": "^2.33.1"
   }
 }
