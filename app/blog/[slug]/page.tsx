@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation'
 import { db } from '@/lib/db'
 import { format } from 'date-fns'
-import MarkdownPreview from '@uiw/react-markdown-preview'
 import Link from 'next/link'
+import Image from 'next/image'
 import { BlogPostActions } from './blog-post-actions'
+import { MarkdownContent } from './markdown-content'
 
 interface BlogPostPageProps {
   params: {
@@ -81,9 +82,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Cover Image */}
           {post.coverImage && (
             <div className="mb-6">
-              <img
+              <Image
                 src={post.coverImage}
                 alt={post.title}
+                width={800}
+                height={256}
                 className="w-full h-64 object-cover rounded-lg"
               />
             </div>
@@ -128,13 +131,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </header>
 
         {/* Post Content */}
-        <article className="prose prose-lg dark:prose-invert max-w-none">
-          <MarkdownPreview
-            source={post.content}
-            style={{ backgroundColor: 'transparent' }}
-            data-color-mode="auto"
-          />
-        </article>
+        <MarkdownContent content={post.content} />
 
         {/* Author Actions - Client Component */}
         <BlogPostActions authorId={post.authorId} slug={post.slug} />

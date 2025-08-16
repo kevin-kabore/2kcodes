@@ -1,46 +1,66 @@
-'use client'
+import {db} from '@/lib/db'
+import {BlogListClient} from './blog-list-client'
 
-import Link from 'next/link'
-import {useDynamicContext} from '@dynamic-labs/sdk-react-core'
+interface BlogPost {
+  id: string
+  title: string
+  slug: string
+  excerpt?: string | null
+  content: string
+  coverImage?: string | null
+  published: boolean
+  publishedAt: string | null
+  author: {
+    id: string
+    username: string
+    email?: string | null
+  }
+  tags: Array<{
+    id: string
+    name: string
+    slug: string
+  }>
+  category?: {
+    id: string
+    name: string
+    slug: string
+  } | null
+  viewCount: number
+  createdAt: string
+  updatedAt: string
+}
 
-export default function BlogPage() {
-  const {user, setShowAuthFlow} = useDynamicContext()
+export default async function BlogPage() {
+  const posts = await db.blogPost.findMany({
+    where: {
+      published: true,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+      tags: true,
+      category: true,
+    },
+    orderBy: {
+      publishedAt: 'desc',
+    },
+  })
 
-  console.log('Dynamic user:', user)
+  const transformedPosts: BlogPost[] = posts.map(post => ({
+    ...post,
+    publishedAt: post.publishedAt?.toISOString() || null,
+    createdAt: post.createdAt.toISOString(),
+    updatedAt: post.updatedAt.toISOString(),
+  }))
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-4xl font-bold">Blog</h1>
-        {user && (
-          <Link
-            href="/blog/write"
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-          >
-            Write a Post
-          </Link>
-        )}
-      </div>
-
-      <div className="grid gap-6">
-        <div className="border border-border rounded-lg p-6">
-          <p className="text-muted-foreground">
-            No blog posts yet.{' '}
-            {user ? (
-              'Write your first post!'
-            ) : (
-              <>
-                <button
-                  onClick={() => setShowAuthFlow(true)}
-                  className="text-primary hover:underline"
-                >
-                  Sign in
-                </button>{' '}
-                to start writing.
-              </>
-            )}
-          </p>
-        </div>
-      </div>
+      <BlogListClient posts={transformedPosts} />
     </div>
   )
 }
