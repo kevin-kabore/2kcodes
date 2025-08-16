@@ -1,20 +1,12 @@
 'use client'
 
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
 import Link from 'next/link'
 
 export default function ProfilePage() {
   const { user, primaryWallet, setShowAuthFlow } = useDynamicContext()
-  const router = useRouter()
 
-  useEffect(() => {
-    // Auto-redirect to wallet-specific NFT collection if wallet is connected
-    if (primaryWallet?.address) {
-      router.push(`/profile/nfts?wallet=${primaryWallet.address}`)
-    }
-  }, [primaryWallet?.address, router])
+  // Removed auto-redirect to prevent flashing and allow users to see the profile page
 
   if (!user || !primaryWallet) {
     return (

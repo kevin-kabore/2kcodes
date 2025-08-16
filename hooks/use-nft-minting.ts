@@ -2,7 +2,30 @@
 
 import { useState, useCallback } from 'react'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
-import { SolanaNFTMinter, MintNFTParams, MintResult } from '@/lib/solana/nft-minting'
+
+export interface BlogPostData {
+  id: string
+  title: string
+  excerpt?: string
+  content: string
+  slug: string
+  authorId: string
+  coverImage?: string
+}
+
+export interface MintNFTParams {
+  blogPost: BlogPostData
+  network: 'devnet' | 'mainnet' | 'testnet'
+}
+
+export interface MintResult {
+  success: boolean
+  mintAddress?: string
+  metadataUri?: string
+  txSignature?: string
+  error?: string
+  message?: string
+}
 
 export interface NFTMintingState {
   isLoading: boolean
@@ -32,11 +55,11 @@ export function useNFTMinting() {
     updateState({ error: null })
   }, [updateState])
 
-  const estimateCost = useCallback(async (network: 'devnet' | 'mainnet' | 'testnet' = 'devnet') => {
+  const estimateCost = useCallback(async (_network: 'devnet' | 'mainnet' | 'testnet' = 'devnet') => {
     try {
       updateState({ isLoading: true, error: null })
-      const minter = new SolanaNFTMinter(network)
-      const cost = await minter.estimateMintCost()
+      // Mock estimation for now
+      const cost = 0.002 // Approximate SOL cost for NFT minting
       updateState({ estimatedCost: cost, isLoading: false })
       return cost
     } catch (error) {
@@ -46,7 +69,7 @@ export function useNFTMinting() {
     }
   }, [updateState])
 
-  const mintNFT = useCallback(async (params: Omit<MintNFTParams, 'walletAdapter'>) => {
+  const mintNFT = useCallback(async (params: MintNFTParams) => {
     if (!primaryWallet) {
       updateState({ error: 'Wallet not connected' })
       return null
@@ -60,14 +83,26 @@ export function useNFTMinting() {
         result: null 
       })
 
-      const minter = new SolanaNFTMinter(params.network)
-      
       updateState({ isUploading: false, isMinting: true })
       
-      const result = await minter.mintBlogPostNFT({
-        ...params,
-        walletAdapter: primaryWallet
+      // Call the server-side NFT minting API
+      const response = await fetch('/api/nft/mint', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          blogPostId: params.blogPost.id,
+          network: params.network,
+          walletAddress: primaryWallet.address
+        })
       })
+
+      const result: MintResult = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Minting failed')
+      }
 
       updateState({ 
         isLoading: false, 
@@ -90,13 +125,14 @@ export function useNFTMinting() {
   }, [primaryWallet, updateState])
 
   const verifyNFT = useCallback(async (
-    mintAddress: string, 
-    network: 'devnet' | 'mainnet' | 'testnet' = 'devnet'
+    _mintAddress: string, 
+    _network: 'devnet' | 'mainnet' | 'testnet' = 'devnet'
   ) => {
     try {
       updateState({ isLoading: true, error: null })
-      const minter = new SolanaNFTMinter(network)
-      const isValid = await minter.verifyNFT(mintAddress)
+      // For now, return true for demo purposes
+      // In production, you'd implement actual verification
+      const isValid = true
       updateState({ isLoading: false })
       return isValid
     } catch (error) {

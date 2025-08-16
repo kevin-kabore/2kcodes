@@ -10,6 +10,8 @@ interface NFTProfilePageProps {
 
 async function getUserNFTs(walletAddress: string) {
   try {
+    console.log('Looking for user with wallet address:', walletAddress)
+    
     // First find the user by wallet address
     const user = await db.user.findFirst({
       where: {
@@ -19,6 +21,8 @@ async function getUserNFTs(walletAddress: string) {
         }
       }
     })
+
+    console.log('Found user:', user ? { id: user.id, username: user.username, walletAddress: user.walletAddress } : 'null')
 
     if (!user) {
       return { user: null, nfts: [] }
@@ -48,6 +52,8 @@ async function getUserNFTs(walletAddress: string) {
         nftMintedAt: 'desc'
       }
     })
+
+    console.log('Found NFTs for user:', nfts.length)
 
     return { user, nfts }
   } catch (error) {

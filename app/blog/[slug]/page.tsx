@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import Image from 'next/image'
-import { BlogPostActions } from './blog-post-actions'
+import { BlogPostClient } from './blog-post-client'
 import { MarkdownContent } from './markdown-content'
 
 interface BlogPostPageProps {
@@ -210,7 +210,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <MarkdownContent content={post.content} />
 
         {/* Author Actions - Client Component */}
-        <BlogPostActions authorId={post.authorId} slug={post.slug} />
+        <BlogPostClient authorId={post.authorId} slug={post.slug} />
 
         {/* Related Posts */}
         {/* TODO: Implement related posts based on tags or category */}
