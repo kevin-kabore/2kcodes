@@ -4,12 +4,20 @@ import { useTheme } from '@/app/contexts/theme-context';
 import { motion } from 'framer-motion';
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
 
   return (
     <button
       onClick={toggleTheme}
-      className="relative w-14 h-14 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-black"
+      className="relative w-14 h-14 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+      style={{
+        backgroundColor: 'hsl(var(--muted))',
+        color: 'hsl(var(--muted-foreground))'
+      }}
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
     >
       <div className="relative w-6 h-6">
