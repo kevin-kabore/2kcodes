@@ -5,10 +5,9 @@ import Link from 'next/link'
 import {useDynamicContext} from '@dynamic-labs/sdk-react-core'
 import {motion, AnimatePresence} from 'framer-motion'
 import {ThemeToggle} from './ui/theme-toggle'
-import {WalletButton} from './web3/wallet-button'
 
 export function Navigation() {
-  const {user, setShowAuthFlow, handleLogOut} = useDynamicContext()
+  const {user, primaryWallet, network, setShowAuthFlow, handleLogOut} = useDynamicContext()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -20,6 +19,34 @@ export function Navigation() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const getNetworkDisplayName = (networkName?: string) => {
+    switch (networkName?.toLowerCase()) {
+      case 'solana':
+      case 'solana-mainnet':
+        return 'Mainnet'
+      case 'solana-devnet':
+        return 'Devnet'
+      case 'solana-testnet':
+        return 'Testnet'
+      default:
+        return networkName || 'Unknown'
+    }
+  }
+
+  const getNetworkIndicatorColor = (networkName?: string) => {
+    switch (networkName?.toLowerCase()) {
+      case 'solana':
+      case 'solana-mainnet':
+        return 'bg-green-500'
+      case 'solana-devnet':
+        return 'bg-orange-500'
+      case 'solana-testnet':
+        return 'bg-blue-500'
+      default:
+        return 'bg-gray-500'
+    }
+  }
 
   const navLinks = [
     {href: '/', label: 'Home'},
@@ -34,56 +61,79 @@ export function Navigation() {
           : 'bg-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="text-xl font-bold text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-          >
-            2kcodes
-          </Link>
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 w-full">
+          {/* Logo and Navigation Links */}
+          <div className="flex items-center space-x-8">
+            <Link
+              href="/"
+              className={`text-xl font-bold transition-colors ${
+                isScrolled
+                  ? 'text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400'
+                  : 'text-white hover:text-purple-300'
+              }`}
+            >
+              kevindotk
+            </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors font-medium"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-6">
+              {navLinks.map(link => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`transition-colors font-medium ${
+                    isScrolled
+                      ? 'text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400'
+                      : 'text-white/90 hover:text-purple-300'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </div>
 
           {/* Right side items */}
           <div className="flex items-center space-x-4">
             <ThemeToggle />
 
-            {/* Wallet Connection */}
-            <div className="hidden md:block">
-              <WalletButton
-                showNetwork={true}
-                showBalance={false}
-                variant="compact"
-              />
-            </div>
-
             {user ? (
               <div className="flex items-center gap-3">
+                {/* Wallet details when connected */}
+                {primaryWallet && (
+                  <div className="hidden md:flex items-center gap-2 text-sm">
+                    <div className={`w-2 h-2 rounded-full ${getNetworkIndicatorColor(String(network))}`} />
+                    <span className={isScrolled ? 'text-muted-foreground' : 'text-white/70'}>
+                      {`${primaryWallet.address.slice(0, 6)}...${primaryWallet.address.slice(-4)}`}
+                    </span>
+                    <span className={`text-xs ${isScrolled ? 'text-muted-foreground' : 'text-white/60'}`}>
+                      {getNetworkDisplayName(String(network))}
+                    </span>
+                  </div>
+                )}
                 <Link
                   href="/profile"
-                  className="px-3 py-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                  className={`px-3 py-2 text-sm transition-colors ${
+                    isScrolled
+                      ? 'text-primary hover:text-primary/80'
+                      : 'text-white/90 hover:text-purple-300'
+                  }`}
                 >
                   Profile
                 </Link>
-                <span className="text-sm text-muted-foreground">
+                <span className={`text-sm ${
+                  isScrolled ? 'text-muted-foreground' : 'text-white/70'
+                }`}>
                   {user.alias || user.email || 'User'}
                 </span>
                 <button
                   onClick={handleLogOut}
-                  className="px-4 py-2 text-sm border border-border rounded-md hover:bg-muted"
+                  className={`px-4 py-2 text-sm border rounded-md transition-colors ${
+                    isScrolled
+                      ? 'border-border hover:bg-muted text-foreground'
+                      : 'border-white/30 hover:bg-white/10 text-white'
+                  }`}
                 >
                   Sign Out
                 </button>
@@ -91,7 +141,11 @@ export function Navigation() {
             ) : (
               <button
                 onClick={() => setShowAuthFlow(true)}
-                className="hidden md:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+                className={`hidden md:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
+                  isScrolled
+                    ? 'text-white bg-purple-600 hover:bg-purple-700'
+                    : 'text-purple-600 bg-white hover:bg-gray-100'
+                }`}
               >
                 Sign In
               </button>
@@ -100,7 +154,11 @@ export function Navigation() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 focus:outline-none"
+              className={`md:hidden inline-flex items-center justify-center p-2 rounded-md transition-colors focus:outline-none ${
+                isScrolled
+                  ? 'text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400'
+                  : 'text-white hover:text-purple-300'
+              }`}
               aria-expanded={isMobileMenuOpen}
             >
               <span className="sr-only">Open main menu</span>
@@ -153,14 +211,18 @@ export function Navigation() {
                 </Link>
               ))}
 
-              {/* Mobile Wallet Connection */}
-              <div className="px-3 py-2">
-                <WalletButton
-                  showNetwork={true}
-                  showBalance={true}
-                  variant="default"
-                />
-              </div>
+              {/* Mobile Wallet Details */}
+              {user && primaryWallet && (
+                <div className="px-3 py-2 flex items-center gap-2 text-sm">
+                  <div className={`w-2 h-2 rounded-full ${getNetworkIndicatorColor(String(network))}`} />
+                  <span className="text-muted-foreground">
+                    {`${primaryWallet.address.slice(0, 6)}...${primaryWallet.address.slice(-4)}`}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {getNetworkDisplayName(String(network))}
+                  </span>
+                </div>
+              )}
               {!user ? (
                 <button
                   onClick={() => {
