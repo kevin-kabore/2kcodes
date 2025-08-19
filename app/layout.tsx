@@ -15,10 +15,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://2kcodes.com',
+    url: 'https://kevindotk.vercel.app',
     title: 'Kevin Kaboré - Software Engineer & Web3 Builder',
     description: 'Personal portfolio and Web3 blog by Kevin Kaboré',
-    siteName: '2kcodes',
+    siteName: 'kevindotk',
   },
   twitter: {
     card: 'summary_large_image',
@@ -34,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-background text-foreground`}>
+      <body className={`${inter.className}`}>
         <ThemeProvider>
           <DynamicProvider>
             {children}

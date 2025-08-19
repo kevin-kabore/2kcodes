@@ -1,4 +1,4 @@
-# 2kcodes Project Context
+# kevindotk Project Context
 
 ## Current Architecture
 - **Framework**: Next.js 14 App Router
