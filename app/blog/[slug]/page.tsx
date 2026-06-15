@@ -210,7 +210,18 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <MarkdownContent content={post.content} />
 
         {/* Author Actions - Client Component */}
-        <BlogPostClient authorId={post.authorId} slug={post.slug} />
+        <BlogPostClient
+          post={{
+            id: post.id,
+            title: post.title,
+            excerpt: post.excerpt,
+            content: post.content,
+            slug: post.slug,
+            authorId: post.authorId,
+            coverImage: post.coverImage,
+            nftMinted: post.nftMinted,
+          }}
+        />
 
         {/* Related Posts */}
         {/* TODO: Implement related posts based on tags or category */}
