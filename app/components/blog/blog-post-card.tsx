@@ -52,7 +52,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
     : null
 
   return (
-    <article className="border border-border rounded-lg p-6 hover:shadow-lg transition-shadow">
+    <article className="group relative border border-border rounded-lg p-6 hover:shadow-lg transition-shadow">
       {post.coverImage && (
         <div className="mb-4">
           <Image
@@ -96,10 +96,16 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           </div>
         )}
 
+        {/*
+          Stretched-link pattern: this is the single semantic link for the card.
+          The after:* overlay covers the whole `group relative` article, making
+          the entire tile clickable while keeping one accessible link named by
+          the title. Any future interactive child must sit above with z-10.
+        */}
         <h2 className="text-xl font-semibold">
-          <Link 
+          <Link
             href={`/blog/${post.slug}`}
-            className="hover:text-primary transition-colors"
+            className="transition-colors group-hover:text-primary after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm"
           >
             {post.title}
           </Link>
@@ -124,13 +130,15 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
           </div>
         )}
 
+        {/*
+          Visual-only affordance, not a second link (the whole card already
+          links to the post via the stretched title link above). group-hover
+          underlines it when the tile is hovered.
+        */}
         <div className="pt-2">
-          <Link
-            href={`/blog/${post.slug}`}
-            className="text-primary hover:underline text-sm font-medium"
-          >
+          <span className="text-primary text-sm font-medium group-hover:underline">
             Read more →
-          </Link>
+          </span>
         </div>
       </div>
     </article>
