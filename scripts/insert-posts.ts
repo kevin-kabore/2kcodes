@@ -39,6 +39,19 @@ async function main() {
       },
     };
 
+    // Restore NFT mint state for already-minted posts. For non-NFT posts this is
+    // empty, so a UI mint done later is preserved across re-runs.
+    const nft = post.nft
+      ? {
+          nftMinted: true,
+          nftMintAddress: post.nft.mintAddress,
+          nftTxSignature: post.nft.txSignature,
+          nftNetwork: post.nft.network,
+          nftMintedAt: post.nft.mintedAt,
+          nftRoyalty: post.nft.royalty ?? 500,
+        }
+      : {};
+
     const result = await prisma.blogPost.upsert({
       where: { slug: post.slug },
       update: {
@@ -49,6 +62,7 @@ async function main() {
         publishedAt: post.publishedAt,
         category,
         tags: { connectOrCreate: tags },
+        ...nft,
       },
       create: {
         author: { connect: { id: author.id } },
@@ -58,8 +72,10 @@ async function main() {
         content,
         published: true,
         publishedAt: post.publishedAt,
+        viewCount: post.viewCount ?? 0,
         category,
         tags: { connectOrCreate: tags },
+        ...nft,
       },
     });
 

@@ -106,6 +106,7 @@ This is a draft post exploring ideas about decentralized content creation...`,
           content: readPostContent(post.file),
           published: true,
           publishedAt: post.publishedAt,
+          viewCount: post.viewCount ?? 0,
           category: {
             connectOrCreate: {
               where: { slug: slugify(post.category) },
@@ -118,6 +119,16 @@ This is a draft post exploring ideas about decentralized content creation...`,
               create: { name, slug: slugify(name) },
             })),
           },
+          ...(post.nft
+            ? {
+                nftMinted: true,
+                nftMintAddress: post.nft.mintAddress,
+                nftTxSignature: post.nft.txSignature,
+                nftNetwork: post.nft.network,
+                nftMintedAt: post.nft.mintedAt,
+                nftRoyalty: post.nft.royalty ?? 500,
+              }
+            : {}),
         },
       });
     }

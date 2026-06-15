@@ -28,13 +28,13 @@ export function AboutSection() {
               architect scalable event-driven systems that turn massive, high-frequency machine data into
               something genuinely useful, for people and AI agents alike. I&apos;m guided by two
               convictions: that the best technology makes complex things feel simple, and that its real
-              purpose is to help people and societies live, learn, and build, not just to ship features.
+              purpose is to help people and societies live, learn and create.
             </p>
 
             <p>
               My focus is <span className="text-purple-600 dark:text-purple-400 font-semibold">architecting scalable event-driven and AI systems</span> for
-              enterprise, designing for a new kind of user that is part human, part autonomous agent.
-              Recently that&apos;s meant leveraging large language models to cut infrastructure alert noise
+              enterprise, making data and products genuinely useful to both the people and the AI agents
+              that increasingly rely on them. Recently that&apos;s meant leveraging large language models to cut infrastructure alert noise
               by over <span className="font-semibold">98%</span>, and building systems that enrich raw
               change events with the context humans and agents actually need to act.
             </p>

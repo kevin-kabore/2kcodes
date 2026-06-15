@@ -15,6 +15,14 @@ export type SeedPost = {
   category: string;
   tags: string[];
   publishedAt: Date;
+  viewCount?: number;
+  nft?: {
+    mintAddress: string;
+    txSignature: string;
+    network: string;
+    mintedAt: Date;
+    royalty?: number; // basis points (500 = 5%)
+  };
 };
 
 export const blogPosts: SeedPost[] = [
@@ -36,7 +44,25 @@ export const blogPosts: SeedPost[] = [
     file: 'using-ai-to-build-a-banana-bread-business.md',
     category: 'AI',
     tags: ['AI', 'Founders', 'Physical Systems'],
-    publishedAt: new Date('2026-02-15T14:00:00Z'),
+    publishedAt: new Date('2026-01-01T14:00:00Z'),
+  },
+  {
+    slug: 'how-decentralization-and-ai-shaped-my-vision',
+    title: 'How Decentralization and AI Shaped My Vision for Economic Development',
+    excerpt:
+      'Decentralization taught me to dream about economic empowerment. AI has forced me to rethink what empowerment means in a world where creation itself can be automated. This is the story of how both technologies reshaped my perspective on building a better future.',
+    file: 'how-decentralization-and-ai-shaped-my-vision.md',
+    category: 'Web3',
+    tags: ['blockchain', 'ai', 'economic development', 'decentralization', 'productivity', 'future of work'],
+    publishedAt: new Date('2025-08-18T19:33:00Z'),
+    viewCount: 6,
+    nft: {
+      mintAddress: '1755545635140gxv74kb7w',
+      txSignature: '1755545635140onkaiqc4w8f',
+      network: 'devnet',
+      mintedAt: new Date('2025-08-18T19:33:00Z'),
+      royalty: 500,
+    },
   },
 ];
 
