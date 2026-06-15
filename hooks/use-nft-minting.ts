@@ -15,6 +15,15 @@ import {
 } from '@metaplex-foundation/umi'
 import bs58 from 'bs58'
 import { createDynamicUmiSigner } from '@/lib/solana/dynamic-signer'
+import {
+  MAX_ONCHAIN_NAME_BYTES,
+  MAX_ONCHAIN_SYMBOL_BYTES,
+  MAX_ONCHAIN_URI_BYTES,
+  byteLength,
+  truncateToBytes,
+} from '@/lib/solana/token-metadata'
+
+const NFT_SYMBOL = 'KBLOG'
 
 export type SolanaNetwork = 'devnet' | 'mainnet' | 'testnet'
 
@@ -77,6 +86,14 @@ function friendlyMintError(err: unknown): string {
     lower.includes('declined')
   ) {
     return 'You declined the transaction in your wallet.'
+  }
+  // Should not happen now that name/symbol are truncated before minting, but
+  // map the on-chain length errors to something legible just in case.
+  if (lower.includes('name too long') || lower.includes('nametoolong')) {
+    return 'The NFT name was too long to mint. This should have been handled automatically; please report it.'
+  }
+  if (lower.includes('uri too long') || lower.includes('uritoolong')) {
+    return 'This post\'s URL is too long to mint. Shorten the post slug and try again.'
   }
   return msg
 }
@@ -148,6 +165,15 @@ export function useNFTMinting() {
           (typeof window !== 'undefined' ? window.location.origin : '')
         const metadataUri = `${origin}/api/nft/metadata/${params.blogPost.slug}`
 
+        // The on-chain metadata URI has a hard 200-byte cap. The full title is
+        // safe (it lives in the off-chain JSON, truncated below), but a very
+        // long slug could overflow the URI, so fail with a clear message.
+        if (byteLength(metadataUri) > MAX_ONCHAIN_URI_BYTES) {
+          throw new Error(
+            'This post\'s URL is too long to mint. Shorten the post slug and try again.'
+          )
+        }
+
         // Build a umi instance signed by the connected browser wallet.
         const walletSigner = await primaryWallet.getSigner()
         const umiSigner = createDynamicUmiSigner(walletSigner)
@@ -168,10 +194,13 @@ export function useNFTMinting() {
         // in-browser (no wallet popup); the wallet signs as payer/creator.
         const mint = generateSigner(umi)
 
+        // The on-chain name is capped at 32 bytes. Truncate it to fit; the full
+        // title is preserved in the off-chain metadata JSON that explorers and
+        // wallets display, so nothing user-facing is lost.
         const { signature } = await createNft(umi, {
           mint,
-          name: params.blogPost.title,
-          symbol: 'KBLOG',
+          name: truncateToBytes(params.blogPost.title, MAX_ONCHAIN_NAME_BYTES),
+          symbol: truncateToBytes(NFT_SYMBOL, MAX_ONCHAIN_SYMBOL_BYTES),
           uri: metadataUri,
           sellerFeeBasisPoints: percentAmount(ROYALTY_BASIS_POINTS / 100, 2),
           isMutable: true,

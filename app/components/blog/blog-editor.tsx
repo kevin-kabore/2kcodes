@@ -10,6 +10,10 @@ import slugify from 'slugify'
 import {useTheme} from '@/app/contexts/theme-context'
 import {useDynamicContext} from '@dynamic-labs/sdk-react-core'
 import {NFTMintingModal} from './nft-minting-modal'
+import {
+  MAX_ONCHAIN_NAME_BYTES,
+  willTruncateOnChainName,
+} from '@/lib/solana/token-metadata'
 import '@uiw/react-md-editor/markdown-editor.css'
 import '@uiw/react-markdown-preview/markdown.css'
 
@@ -174,6 +178,13 @@ export function BlogEditor({
         {errors.title && (
           <p className="mt-1 text-sm text-destructive">
             {errors.title.message}
+          </p>
+        )}
+        {watchTitle && willTruncateOnChainName(watchTitle) && (
+          <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+            Heads up: titles longer than {MAX_ONCHAIN_NAME_BYTES} characters are
+            shortened in the NFT&apos;s on-chain name when minting. The full
+            title is always kept in the post and the NFT metadata.
           </p>
         )}
       </div>

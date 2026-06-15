@@ -4,6 +4,11 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useNFTMinting } from '@/hooks/use-nft-minting'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
+import {
+  MAX_ONCHAIN_NAME_BYTES,
+  truncateToBytes,
+  willTruncateOnChainName,
+} from '@/lib/solana/token-metadata'
 
 interface NFTMintingModalProps {
   isOpen: boolean
@@ -113,6 +118,14 @@ export function NFTMintingModal({ isOpen, onClose, blogPost, onMintSuccess }: NF
                 {blogPost.excerpt && (
                   <p className="text-sm text-muted-foreground mb-2">
                     {blogPost.excerpt}
+                  </p>
+                )}
+                {willTruncateOnChainName(blogPost.title) && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">
+                    The on-chain name is limited to {MAX_ONCHAIN_NAME_BYTES}{' '}
+                    characters, so it will be saved as &ldquo;
+                    {truncateToBytes(blogPost.title, MAX_ONCHAIN_NAME_BYTES)}
+                    &rdquo;. The full title is preserved in the NFT metadata.
                   </p>
                 )}
                 {blogPost.coverImage && (
