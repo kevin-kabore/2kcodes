@@ -9,18 +9,15 @@ re-run — it upserts by slug and preserves the backdated publish dates).
 
 ## 1. Publish the posts to production
 
-You need the production `DATABASE_URL` (the Postgres/Supabase connection string from your
-Vercel project env). Two ways to get it:
-
-- **Vercel CLI:** `npx vercel link` then `npx vercel env pull .env.production.local`
-  (the file will contain `DATABASE_URL=...`).
-- **Vercel dashboard:** Project → Settings → Environment Variables → copy `DATABASE_URL`.
-
-Then run the insert script against prod:
+Prisma reads `POSTGRES_PRISMA_URL` (provided on Vercel by the Supabase integration).
+To run the insert script against prod, pass the v2 connection explicitly:
 
 ```bash
-DATABASE_URL="<your prod connection string>" npx tsx scripts/insert-posts.ts
+POSTGRES_PRISMA_URL="<v2 connection string>" npx tsx scripts/insert-posts.ts
 ```
+
+You must sign in once on the live site first (creates your user row); the script
+attaches the posts to that user.
 
 What it does:
 - Title: `The Bottleneck Is Attention` → published **2026-06-01**, category Engineering

@@ -1,11 +1,11 @@
 /**
  * Idempotent insert of the authored long-form blog posts into whatever database
- * DATABASE_URL points at. Safe to run against production: it upserts by slug,
- * preserves backdated publishedAt values, and attaches them to the first user
- * in the DB (your Dynamic account on prod).
+ * the Prisma datasource points at (POSTGRES_PRISMA_URL). Safe to run against
+ * production: it upserts by slug, preserves backdated publishedAt values, and
+ * attaches them to the first user in the DB (your Dynamic account on prod).
  *
- * Usage (production):
- *   DATABASE_URL="<prod connection string>" npx tsx scripts/insert-posts.ts
+ * Usage (production — pass the v2 connection explicitly):
+ *   POSTGRES_PRISMA_URL="<prod connection string>" npx tsx scripts/insert-posts.ts
  *
  * Usage (local, reads .env.local):
  *   npm run db:insert-posts
