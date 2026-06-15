@@ -1,49 +1,47 @@
 # The Bottleneck Is Attention
 
-For most of computing history, the scarce thing was the machine. Compute was expensive, storage was precious, and good engineering meant being frugal with both. We are not in that world anymore. Compute is abundant and getting cheaper, storage is effectively free, and our systems now generate data faster than any human could ever hope to read it.
+For most of computing history, the scarce thing was the machine. Compute cost money. Storage cost money. Good engineering meant being careful with both. That world is gone. Compute keeps getting cheaper, storage is basically free, and our systems now produce data far faster than anyone can read it.
 
-When the constraint moves, the interesting work moves with it. And the constraint has moved decisively to a single place: attention. Human attention has always been finite. What's new is that machine attention is now finite too, and just as worth designing around.
+When the scarce resource changes, the interesting work follows it. Right now the scarce resource is attention. Human attention was always limited. The newer problem is that machine attention is limited too, and we have to design around it the same way.
 
-I spend my days inside this problem. I work on event signal processing, the systems that take enormous, high-frequency streams of machine events and try to make them mean something. It has quietly become one of the best vantage points I know for seeing where technology is headed.
+I spend my days on this. I work on event signal processing, the systems that take huge, high-frequency streams of machine events and try to make them mean something. It's a good place to watch where things are heading.
 
 ## Abundance creates a new kind of poverty
 
-A modern software system emits an astonishing volume of events. Every deploy, every config change, every scaling action, every blip. In isolation each one is a fact. In aggregate they are a fog.
+A modern software system emits a staggering number of events. Every deploy, every config change, every scaling action, every blip. One at a time, each one is a fact. All of them together, fog.
 
-This is the paradox of abundance. We solved the problem of capturing what happens, and in doing so we created a harder one: almost none of it matters at any given moment, but the few things that do are buried. More data did not produce more understanding. It produced more noise to wade through on the way to the few things that matter.
+We got very good at capturing what happens. Doing that created a worse problem. Almost none of it matters in any given moment, and the few things that do are buried under everything that doesn't. More data didn't give us more understanding, just more to dig through.
 
-Anyone who has been paged at 3am for something that didn't matter already knows this. The cost of noise isn't abstract. It is trust, and time, and the slow erosion of anyone's willingness to look at all.
+Anyone who's been paged at 3am for nothing already knows this in their gut. The cost of noise isn't abstract. It burns trust and it burns time, and eventually people just stop looking at the alerts.
 
-## Curation as the high-leverage act
+## Curation is the high-leverage act
 
-The instinct of the last decade was to throw more dashboards at the problem. Give people every chart and let them figure it out. That is the equivalent of responding to information overload by printing more newspapers.
+The reflex for the last decade was to add dashboards. Give everyone every chart and let them sort it out. That's like answering information overload by printing more newspapers.
 
-The work that actually moves the needle is the opposite: aggressive, intelligent curation. On one recent effort, we used large language models to evaluate the risk and significance of changes flowing through a system, and cut the noise reaching humans by more than 98 percent, measured against what engineers later confirmed actually mattered. We didn't hide anything. We weighed it, and made the judgment call that turns a firehose into a signal.
+The thing that actually helps is the opposite. You curate, hard, and you do it intelligently. On one project we used large language models to judge the risk and significance of changes moving through a system. We cut the noise reaching humans by more than 98 percent, measured against what engineers later confirmed had actually mattered. Nothing was hidden. We weighed it and made a call. That judgment is most of the work.
 
-The interesting part isn't the percentage. It's what it implies. If 98 percent of what a system surfaced didn't deserve a human's attention, then the bottleneck was never the data. It was the absence of judgment between the data and the person. AI is unusually good at supplying that judgment at scale, and that, more than anything I can produce in a chat window, is where I think it earns its keep over the next few years.
+The percentage isn't the interesting part. What's interesting is what it says. If 98 percent of what a system showed people didn't deserve their attention, the bottleneck was never the data. It was that nothing stood between the data and the person to make a judgment. AI is good at making that judgment at scale. I think that's where it earns its keep over the next few years, more than anything I can get out of a chat window.
 
 ## Context is what makes data legible
 
-Cutting noise is half the job. The other half is making what survives actually legible.
+Cutting noise gets you halfway. You also have to make what's left readable.
 
-A raw event, "this resource changed," is nearly useless on its own. The same event enriched with context, which services depend on it, who owns them, what is likely to break, becomes something a person can act on in seconds. A lot of my work is exactly this kind of enrichment: taking a bare signal and wrapping it in the context that turns it from a fact into a decision.
+"This resource changed" is close to useless by itself. Enrich it with the things around it, which services depend on it, who owns them, what's likely to break, and suddenly a person can act on it in seconds. A lot of my work is exactly that. You take a bare signal and wrap it in enough context to turn it into a decision.
 
-I have come to think of legibility as the real product. The goal isn't to show people more. It's to let them understand more with less, to compress a sprawling system down to the few things a human mind can hold at once. It lets someone who isn't a domain expert reason about a system that would otherwise be closed to them.
+I've started to think of legibility as the actual product. Showing people more of the system was never the goal. Letting them act on less of it is. Get a sprawling thing down to the few parts a person can hold in their head at once, and someone who isn't an expert can still reason about it.
 
-## The second reader is not human
+## The second reader isn't human
 
-Here is the shift that I think changes the shape of everything. For my entire career, the consumer of all this curated, enriched information was a person. That assumption is now wrong.
+Here's the shift I keep coming back to. For my whole career, the reader at the end of all this curated, enriched information was a person. That's no longer a safe assumption.
 
-Increasingly the thing reading the event stream is an agent, a piece of software acting with autonomy on behalf of a person or a business. And agents, it turns out, are subject to the same economics of attention we are. Flood an agent with noise and it makes worse decisions, just as we do. Hand it the same well-curated, well-contextualized signal a good engineer would want, and it acts well.
+More and more, the thing reading the event stream is an agent. Software acting on its own on behalf of a person or a business. And agents turn out to have the same attention economics we do. Flood one with noise and it makes worse decisions, the same way we do. Hand it the clean, well-contextualized signal a good engineer would want, and it does better work.
 
-This reframes the work. The systems I build are no longer designed for human readers alone. They are designed for two kinds of reader at once, the human and the AI agent, and the discipline that serves one turns out to serve the other. Good curation and rich context are not nice-to-haves for the agentic web. They are the substrate it runs on. The teams that learn to make a machine-scale system legible to a human and an agent at the same time are working on something that matters.
+So the work changes shape. The systems I build aren't designed only for human readers anymore. They're designed for a human and an agent at the same time, and it turns out the discipline that serves one serves the other. Good curation and context end up being the foundation the agentic web runs on.
 
-## Why I think this is a frontier worth betting on
+## Why I think this is worth betting on
 
-I try to hold a measured view of AI. A lot of what gets sold as revolution is autocomplete with good marketing, and we have all watched a hype cycle confuse motion with progress before. So I look for the parts that survive the skepticism.
+I try to stay measured about AI. A lot of what gets sold as revolution is autocomplete with a marketing budget, and we've all watched a hype cycle mistake motion for progress. So I look for the part that survives the skepticism.
 
-The part that survives, for me, is this: as machines produce more of the world's information, the scarce and valuable skill becomes deciding what deserves attention and giving it the context to be understood. That is durable. It does not depend on any single model or any particular wave of enthusiasm. It follows directly from the fact that attention is finite and data is not.
+For me, the part that survives is this. As machines generate more of the world's information, the valuable skill becomes deciding what's worth attention and giving it the context to be understood. That doesn't depend on any one model or any particular wave of excitement. It follows from a simple fact: attention is finite and data isn't.
 
-It also points somewhere humane. The optimistic version of this technology is not one where machines drown us in their output. It is one where they hand us, and the agents working on our behalf, exactly the few things that matter, in a form we can actually use.
-
-The bottleneck is attention. Almost everything interesting starts the moment you treat it as the scarce resource it has quietly become.
+It also points somewhere I actually like. In the good version of this, machines don't bury us in their output. They hand us, and the agents working on our behalf, the few things that matter, and they do it in a form we can actually use.

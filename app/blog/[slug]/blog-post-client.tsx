@@ -32,16 +32,25 @@ export function BlogPostClient({ post }: BlogPostClientProps) {
     <div className="mt-8 pt-8 border-t border-border">
       <h3 className="text-lg font-semibold mb-4">Author Actions</h3>
 
-      {post.nftMinted ? (
-        <p className="text-sm text-muted-foreground">🎨 This post is minted as an NFT.</p>
-      ) : (
-        <button
-          onClick={() => setShowMint(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:opacity-90 transition-opacity"
+      <div className="flex flex-wrap items-center gap-3">
+        <a
+          href={`/blog/${post.slug}/edit`}
+          className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors"
         >
-          🎨 Mint as NFT
-        </button>
-      )}
+          ✏️ Edit
+        </a>
+
+        {post.nftMinted ? (
+          <p className="text-sm text-muted-foreground">🎨 This post is minted as an NFT.</p>
+        ) : (
+          <button
+            onClick={() => setShowMint(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:opacity-90 transition-opacity"
+          >
+            🎨 Mint as NFT
+          </button>
+        )}
+      </div>
 
       <NFTMintingModal
         isOpen={showMint}
@@ -65,7 +74,7 @@ export function BlogPostClient({ post }: BlogPostClientProps) {
                 nftMintAddress: result.mintAddress,
                 nftMetadataUri: result.metadataUri,
                 nftTxSignature: result.txSignature,
-                nftNetwork: 'devnet',
+                nftNetwork: result.network,
                 nftMintedAt: new Date().toISOString(),
               }),
             })

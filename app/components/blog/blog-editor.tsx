@@ -30,7 +30,26 @@ const blogPostSchema = z.object({
 
 type BlogPostFormData = z.infer<typeof blogPostSchema>
 
-export function BlogEditor({postId, userId}: {postId?: string; userId?: string}) {
+export interface BlogEditorInitialValues {
+  title?: string
+  excerpt?: string | null
+  content?: string
+  coverImage?: string | null
+  tags?: string
+  categoryId?: string | null
+  published?: boolean
+  slug?: string
+}
+
+export function BlogEditor({
+  postId,
+  userId,
+  initialValues,
+}: {
+  postId?: string
+  userId?: string
+  initialValues?: BlogEditorInitialValues
+}) {
   const router = useRouter()
   const {theme} = useTheme()
   const {primaryWallet} = useDynamicContext()
@@ -50,8 +69,13 @@ export function BlogEditor({postId, userId}: {postId?: string; userId?: string})
   } = useForm<BlogPostFormData>({
     resolver: zodResolver(blogPostSchema),
     defaultValues: {
-      published: false,
-      content: '',
+      title: initialValues?.title ?? '',
+      excerpt: initialValues?.excerpt ?? '',
+      content: initialValues?.content ?? '',
+      coverImage: initialValues?.coverImage ?? '',
+      tags: initialValues?.tags ?? '',
+      categoryId: initialValues?.categoryId ?? undefined,
+      published: initialValues?.published ?? false,
     },
   })
 
@@ -71,23 +95,37 @@ export function BlogEditor({postId, userId}: {postId?: string; userId?: string})
 
     setIsSubmitting(true)
     try {
-      const slug = generateSlug()
-      const response = await fetch('/api/blog/posts', {
-        method: postId ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...data,
-          slug,
-          userId,
-          coverImage: data.coverImage || null,
-          tags: data.tags
-            ?.split(',')
-            .map(tag => tag.trim())
-            .filter(Boolean),
-        }),
-      })
+      const tags = data.tags
+        ?.split(',')
+        .map(tag => tag.trim())
+        .filter(Boolean)
+
+      // Edit mode (postId) updates the existing post by id via PATCH; create
+      // mode posts a new record. PATCH does not change the slug (see the route).
+      const response = postId
+        ? await fetch(`/api/blog/posts/${postId}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              title: data.title,
+              excerpt: data.excerpt || null,
+              content: data.content,
+              coverImage: data.coverImage || null,
+              published: data.published,
+              tags,
+            }),
+          })
+        : await fetch('/api/blog/posts', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              ...data,
+              slug: generateSlug(),
+              userId,
+              coverImage: data.coverImage || null,
+              tags,
+            }),
+          })
 
       if (!response.ok) {
         throw new Error('Failed to save blog post')
@@ -100,13 +138,17 @@ export function BlogEditor({postId, userId}: {postId?: string; userId?: string})
       if (shouldMintNFT && primaryWallet && data.published) {
         setShowNFTModal(true)
       } else {
-        // Show success message and redirect to blog listing
+        // Show success message and redirect to the post (edit) or listing (create)
         alert(
           `Blog post "${savedPost.title}" ${
-            data.published ? 'published' : 'saved as draft'
+            postId
+              ? 'updated'
+              : data.published
+                ? 'published'
+                : 'saved as draft'
           } successfully!`,
         )
-        router.push('/blog')
+        router.push(postId ? `/blog/${savedPost.slug}` : '/blog')
       }
     } catch (error) {
       console.error('Error saving blog post:', error)
@@ -318,7 +360,7 @@ export function BlogEditor({postId, userId}: {postId?: string; userId?: string})
                   nftMintAddress: result.mintAddress,
                   nftMetadataUri: result.metadataUri,
                   nftTxSignature: result.txSignature,
-                  nftNetwork: 'devnet', // This should be dynamic based on the network used
+                  nftNetwork: result.network,
                   nftMintedAt: new Date().toISOString(),
                 }),
               })

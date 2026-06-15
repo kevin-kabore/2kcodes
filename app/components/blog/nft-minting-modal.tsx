@@ -17,7 +17,7 @@ interface NFTMintingModalProps {
     authorId: string
     coverImage?: string | null
   }
-  onMintSuccess?: (result: { mintAddress: string; metadataUri: string; txSignature: string }) => void
+  onMintSuccess?: (result: { mintAddress: string; metadataUri: string; txSignature: string; network: 'devnet' | 'mainnet' | 'testnet' }) => void
 }
 
 export function NFTMintingModal({ isOpen, onClose, blogPost, onMintSuccess }: NFTMintingModalProps) {
@@ -50,10 +50,11 @@ export function NFTMintingModal({ isOpen, onClose, blogPost, onMintSuccess }: NF
       onMintSuccess?.({
         mintAddress: result.mintAddress,
         metadataUri: result.metadataUri,
-        txSignature: result.txSignature
+        txSignature: result.txSignature,
+        network: result.network ?? network
       })
     }
-  }, [result, onMintSuccess])
+  }, [result, onMintSuccess, network])
 
   const handleMint = async () => {
     clearError()
@@ -168,7 +169,7 @@ export function NFTMintingModal({ isOpen, onClose, blogPost, onMintSuccess }: NF
                   <div className="mt-3 p-3 border border-border rounded-lg">
                     <div className="text-sm text-muted-foreground">
                       <p>• Royalty: 5% (500 basis points)</p>
-                      <p>• Metadata stored on IPFS/Arweave</p>
+                      <p>• Metadata hosted at kevindotk.xyz</p>
                       <p>• Creator: Your wallet address</p>
                       <p>• External URL: Links to your blog post</p>
                     </div>
@@ -187,10 +188,20 @@ export function NFTMintingModal({ isOpen, onClose, blogPost, onMintSuccess }: NF
               {result?.success && (
                 <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 p-3 rounded-lg mb-4">
                   <p className="text-sm font-medium mb-2">NFT Minted Successfully! 🎉</p>
-                  <div className="text-xs space-y-1">
+                  <div className="text-xs space-y-1 break-all">
                     <p>Mint Address: {result.mintAddress}</p>
                     <p>Transaction: {result.txSignature}</p>
                   </div>
+                  {result.mintAddress && (
+                    <a
+                      href={`https://explorer.solana.com/address/${result.mintAddress}?cluster=${network}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-2 text-xs font-medium underline hover:no-underline"
+                    >
+                      View on Solana Explorer →
+                    </a>
+                  )}
                 </div>
               )}
 
@@ -223,7 +234,7 @@ export function NFTMintingModal({ isOpen, onClose, blogPost, onMintSuccess }: NF
                 <div className="mt-4 text-center">
                   <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
                   <span className="text-sm text-muted-foreground">
-                    {isUploading ? 'Uploading metadata to IPFS...' : 'Processing transaction...'}
+                    {isUploading ? 'Preparing metadata...' : 'Approve in your wallet to mint...'}
                   </span>
                 </div>
               )}

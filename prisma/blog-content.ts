@@ -30,7 +30,7 @@ export const blogPosts: SeedPost[] = [
     slug: 'the-bottleneck-is-attention',
     title: 'The Bottleneck Is Attention',
     excerpt:
-      'Compute is cheap and data is infinite. Attention — human, and now machine — is the real scarce resource. What cutting alert noise by over 98% taught me about curation, legibility, and building for a reader that is part human, part AI agent.',
+      'Compute is cheap and data is effectively infinite. The scarce resource now is attention, both human and machine. What cutting alert noise by over 98% taught me about curation, legibility, and building for a reader that is part human, part AI agent.',
     file: 'the-bottleneck-is-attention.md',
     category: 'Engineering',
     tags: ['AI', 'Systems', 'Attention'],

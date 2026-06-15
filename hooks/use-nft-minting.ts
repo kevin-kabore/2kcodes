@@ -2,6 +2,30 @@
 
 import { useState, useCallback } from 'react'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
+import { isSolanaWallet } from '@dynamic-labs/solana'
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
+import {
+  createNft,
+  mplTokenMetadata,
+} from '@metaplex-foundation/mpl-token-metadata'
+import {
+  generateSigner,
+  percentAmount,
+  signerIdentity,
+} from '@metaplex-foundation/umi'
+import bs58 from 'bs58'
+import { createDynamicUmiSigner } from '@/lib/solana/dynamic-signer'
+
+export type SolanaNetwork = 'devnet' | 'mainnet' | 'testnet'
+
+const RPC_ENDPOINTS: Record<SolanaNetwork, string> = {
+  devnet: 'https://api.devnet.solana.com',
+  testnet: 'https://api.testnet.solana.com',
+  mainnet: 'https://api.mainnet-beta.solana.com',
+}
+
+// Royalty paid to the creator on secondary sales, in basis points (500 = 5%).
+const ROYALTY_BASIS_POINTS = 500
 
 export interface BlogPostData {
   id: string
@@ -15,7 +39,7 @@ export interface BlogPostData {
 
 export interface MintNFTParams {
   blogPost: BlogPostData
-  network: 'devnet' | 'mainnet' | 'testnet'
+  network: SolanaNetwork
 }
 
 export interface MintResult {
@@ -23,8 +47,38 @@ export interface MintResult {
   mintAddress?: string
   metadataUri?: string
   txSignature?: string
+  network?: SolanaNetwork
   error?: string
   message?: string
+}
+
+// Translate raw umi/web3.js send errors into something a user can act on.
+function friendlyMintError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err)
+  const lower = msg.toLowerCase()
+  if (
+    lower.includes('no record of a prior credit') ||
+    lower.includes('insufficient') ||
+    lower.includes('debit an account') ||
+    lower.includes('needs devnet sol')
+  ) {
+    return 'Your wallet needs devnet SOL to mint. Get some free at faucet.solana.com (paste your address, pick Devnet), then try again.'
+  }
+  if (
+    lower.includes('429') ||
+    lower.includes('rate limit') ||
+    lower.includes('too many requests')
+  ) {
+    return 'The Solana devnet RPC is busy right now. Wait a few seconds and try again.'
+  }
+  if (
+    lower.includes('user rejected') ||
+    lower.includes('rejected the request') ||
+    lower.includes('declined')
+  ) {
+    return 'You declined the transaction in your wallet.'
+  }
+  return msg
 }
 
 export interface NFTMintingState {
@@ -44,7 +98,7 @@ export function useNFTMinting() {
     isMinting: false,
     error: null,
     result: null,
-    estimatedCost: null
+    estimatedCost: null,
   })
 
   const updateState = useCallback((updates: Partial<NFTMintingState>) => {
@@ -55,92 +109,97 @@ export function useNFTMinting() {
     updateState({ error: null })
   }, [updateState])
 
-  const estimateCost = useCallback(async (_network: 'devnet' | 'mainnet' | 'testnet' = 'devnet') => {
-    try {
-      updateState({ isLoading: true, error: null })
-      // Mock estimation for now
-      const cost = 0.002 // Approximate SOL cost for NFT minting
-      updateState({ estimatedCost: cost, isLoading: false })
+  const estimateCost = useCallback(
+    async (_network: SolanaNetwork = 'devnet') => {
+      // Rough on-chain cost: mint account rent + metadata + master edition +
+      // transaction fees. Devnet SOL is free via airdrop.
+      const cost = 0.012
+      updateState({ estimatedCost: cost })
       return cost
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to estimate cost'
-      updateState({ error: errorMessage, isLoading: false })
-      return null
-    }
-  }, [updateState])
+    },
+    [updateState]
+  )
 
-  const mintNFT = useCallback(async (params: MintNFTParams) => {
-    if (!primaryWallet) {
-      updateState({ error: 'Wallet not connected' })
-      return null
-    }
-
-    try {
-      updateState({ 
-        isLoading: true, 
-        isUploading: true, 
-        error: null, 
-        result: null 
-      })
-
-      updateState({ isUploading: false, isMinting: true })
-      
-      // Call the server-side NFT minting API
-      const response = await fetch('/api/nft/mint', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          blogPostId: params.blogPost.id,
-          network: params.network,
-          walletAddress: primaryWallet.address
-        })
-      })
-
-      const result: MintResult = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Minting failed')
+  const mintNFT = useCallback(
+    async (params: MintNFTParams): Promise<MintResult | null> => {
+      if (!primaryWallet) {
+        updateState({ error: 'Wallet not connected' })
+        return null
       }
 
-      updateState({ 
-        isLoading: false, 
-        isMinting: false, 
-        result,
-        error: result.success ? null : result.error || 'Minting failed'
-      })
+      if (!isSolanaWallet(primaryWallet)) {
+        updateState({ error: 'Connect a Solana wallet to mint this post' })
+        return null
+      }
 
-      return result
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-      updateState({ 
-        isLoading: false, 
-        isUploading: false, 
-        isMinting: false, 
-        error: errorMessage 
-      })
-      return null
-    }
-  }, [primaryWallet, updateState])
+      try {
+        updateState({
+          isLoading: true,
+          isUploading: true,
+          isMinting: false,
+          error: null,
+          result: null,
+        })
 
-  const verifyNFT = useCallback(async (
-    _mintAddress: string, 
-    _network: 'devnet' | 'mainnet' | 'testnet' = 'devnet'
-  ) => {
-    try {
-      updateState({ isLoading: true, error: null })
-      // For now, return true for demo purposes
-      // In production, you'd implement actual verification
-      const isValid = true
-      updateState({ isLoading: false })
-      return isValid
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Verification failed'
-      updateState({ error: errorMessage, isLoading: false })
-      return false
-    }
-  }, [updateState])
+        // Metadata is served by our own API route, so the only "upload" is
+        // computing the stable URI the on-chain NFT will point at.
+        const origin =
+          process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, '') ||
+          (typeof window !== 'undefined' ? window.location.origin : '')
+        const metadataUri = `${origin}/api/nft/metadata/${params.blogPost.slug}`
+
+        // Build a umi instance signed by the connected browser wallet.
+        const walletSigner = await primaryWallet.getSigner()
+        const umiSigner = createDynamicUmiSigner(walletSigner)
+        const umi = createUmi(RPC_ENDPOINTS[params.network])
+          .use(mplTokenMetadata())
+          .use(signerIdentity(umiSigner))
+
+        // Fail fast with a clear message if the wallet can't cover rent + fees,
+        // which is the most common first-time failure (empty devnet wallet).
+        const balance = await umi.rpc.getBalance(umiSigner.publicKey)
+        if (balance.basisPoints < 5_000_000n) {
+          throw new Error('Wallet needs devnet SOL')
+        }
+
+        updateState({ isUploading: false, isMinting: true })
+
+        // The mint signer's public key becomes the NFT's mint address. It signs
+        // in-browser (no wallet popup); the wallet signs as payer/creator.
+        const mint = generateSigner(umi)
+
+        const { signature } = await createNft(umi, {
+          mint,
+          name: params.blogPost.title,
+          symbol: 'KBLOG',
+          uri: metadataUri,
+          sellerFeeBasisPoints: percentAmount(ROYALTY_BASIS_POINTS / 100, 2),
+          isMutable: true,
+        }).sendAndConfirm(umi)
+
+        const result: MintResult = {
+          success: true,
+          mintAddress: mint.publicKey.toString(),
+          metadataUri,
+          txSignature: bs58.encode(signature),
+          network: params.network,
+          message: 'NFT minted successfully',
+        }
+
+        updateState({ isLoading: false, isMinting: false, result })
+        return result
+      } catch (error) {
+        updateState({
+          isLoading: false,
+          isUploading: false,
+          isMinting: false,
+          error: friendlyMintError(error),
+        })
+        return null
+      }
+    },
+    [primaryWallet, updateState]
+  )
 
   const reset = useCallback(() => {
     setState({
@@ -149,18 +208,17 @@ export function useNFTMinting() {
       isMinting: false,
       error: null,
       result: null,
-      estimatedCost: null
+      estimatedCost: null,
     })
   }, [])
 
   return {
     ...state,
     mintNFT,
-    verifyNFT,
     estimateCost,
     clearError,
     reset,
     isWalletConnected: !!primaryWallet,
-    walletAddress: primaryWallet?.address
+    walletAddress: primaryWallet?.address,
   }
 }
