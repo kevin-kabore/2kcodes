@@ -9,11 +9,11 @@ re-run — it upserts by slug and preserves the backdated publish dates).
 
 ## 1. Publish the posts to production
 
-Prisma reads `POSTGRES_PRISMA_URL` (provided on Vercel by the Supabase integration).
-To run the insert script against prod, pass the v2 connection explicitly:
+Prisma reads `DATABASE_URL`. To run the insert script against prod, pass the v2
+pooled connection explicitly:
 
 ```bash
-POSTGRES_PRISMA_URL="<v2 connection string>" npx tsx scripts/insert-posts.ts
+DATABASE_URL="postgres://postgres.luykdpylhgndirlmsbze:<password>@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true" npx tsx scripts/insert-posts.ts
 ```
 
 You must sign in once on the live site first (creates your user row); the script

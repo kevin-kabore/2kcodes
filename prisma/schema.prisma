@@ -9,11 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  // Pooled (pgbouncer) connection for app runtime; provided by the Supabase–Vercel integration.
-  url       = env("POSTGRES_PRISMA_URL")
-  // Direct connection for migrations / introspection.
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
