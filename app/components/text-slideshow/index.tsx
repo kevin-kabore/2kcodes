@@ -13,7 +13,7 @@ const TextSlideshow: React.FC<TextSlideshowProps> = ({ prefix, items }) => {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const current = items[wordIndex % items.length];
+    const current = items[wordIndex % items.length] ?? '';
     let timeout: ReturnType<typeof setTimeout>;
 
     if (!deleting) {
