@@ -36,7 +36,7 @@ Here is the shift that I think changes the shape of everything. For my entire ca
 
 Increasingly the thing reading the event stream is an agent, a piece of software acting with autonomy on behalf of a person or a business. And agents, it turns out, are subject to the same economics of attention we are. Flood an agent with noise and it makes worse decisions, just as we do. Hand it the same well-curated, well-contextualized signal a good engineer would want, and it acts well.
 
-This reframes the work. The systems I build are no longer designed for human readers alone. They are designed for a new kind of user that is part human, part autonomous agent, and the discipline that serves one turns out to serve the other. Good curation and rich context are not nice-to-haves for the agentic web. They are the substrate it runs on. The teams that learn to make a machine-scale system legible to a human and an agent at the same time are working on something that matters.
+This reframes the work. The systems I build are no longer designed for human readers alone. They are designed for two kinds of reader at once, the human and the AI agent, and the discipline that serves one turns out to serve the other. Good curation and rich context are not nice-to-haves for the agentic web. They are the substrate it runs on. The teams that learn to make a machine-scale system legible to a human and an agent at the same time are working on something that matters.
 
 ## Why I think this is a frontier worth betting on
 
