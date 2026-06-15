@@ -90,7 +90,13 @@
     font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
+
+  /* Tailwind v4's reset drops the pointer cursor on buttons; restore it. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;

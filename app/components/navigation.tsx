@@ -2,6 +2,7 @@
 
 import {useState, useEffect} from 'react'
 import Link from 'next/link'
+import {usePathname} from 'next/navigation'
 import {useDynamicContext} from '@dynamic-labs/sdk-react-core'
 import {motion, AnimatePresence} from 'framer-motion'
 import {ThemeToggle} from './ui/theme-toggle'
@@ -10,15 +11,24 @@ export function Navigation() {
   const {user, primaryWallet, network, setShowAuthFlow, handleLogOut} = useDynamicContext()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
+  // The transparent/white-text nav only reads well over the home page's dark hero.
+  // On every other page the background is the theme background, so use the solid,
+  // theme-aware styling (driven by isScrolled) immediately.
+  const isHome = pathname === '/'
 
   useEffect(() => {
+    if (!isHome) {
+      setIsScrolled(true)
+      return
+    }
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10)
     }
-
+    handleScroll()
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [isHome])
 
   const getNetworkDisplayName = (networkName?: string) => {
     switch (networkName?.toLowerCase()) {

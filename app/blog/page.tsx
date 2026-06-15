@@ -1,6 +1,9 @@
 import {db} from '@/lib/db'
 import {BlogListClient} from './blog-list-client'
 
+// Posts come from the DB, so render per-request instead of baking at build.
+export const dynamic = 'force-dynamic'
+
 interface BlogPost {
   id: string
   title: string

@@ -26,9 +26,9 @@ export function AboutSection() {
               I&apos;m a <span className="text-purple-600 dark:text-purple-400 font-semibold">Software Engineer</span> at{' '}
               <span className="font-semibold">Datadog</span>, on the Event Signal Processing team, where I
               architect scalable event-driven systems that turn massive, high-frequency machine data into
-              something genuinely useful, for people and AI agents alike. I&apos;m driven by a simple
-              conviction: the highest use of cutting-edge technology is to advance how human societies
-              live, learn, and build, not just to ship features.
+              something genuinely useful, for people and AI agents alike. I&apos;m guided by two
+              convictions: that the best technology makes complex things feel simple, and that its real
+              purpose is to help people and societies live, learn, and build, not just to ship features.
             </p>
 
             <p>
