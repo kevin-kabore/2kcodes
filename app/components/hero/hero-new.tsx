@@ -15,6 +15,7 @@ export function HeroNew() {
   };
 
   const textSlideshowItems = [
+    'a founder of a bakery...',
     'a software engineer...',
     'building at Datadog...',
     'an NYU Alum...',
@@ -24,6 +25,10 @@ export function HeroNew() {
     'a competitor...',
     'an optimist...',
     'a follower of Christ...',
+    'a brother of Islam...',
+    'an ally of the Jewish community...',
+    'one who honors all faiths...',
+    'one who honors all people...',
   ];
 
   return (

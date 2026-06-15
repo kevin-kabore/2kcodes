@@ -23,25 +23,49 @@ export function AboutSection() {
           
           <div className="space-y-6 text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>
-              I&apos;m a <span className="text-purple-600 dark:text-purple-400 font-semibold">Software Engineer</span> currently 
-              building infrastructure management tools at{' '}
-              <span className="font-semibold">Datadog</span>. With a passion for creating 
-              elegant solutions to complex problems, I specialize in frontend engineering, 
-              developer experience, and emerging Web3 technologies.
+              I&apos;m a <span className="text-purple-600 dark:text-purple-400 font-semibold">Software Engineer</span> at{' '}
+              <span className="font-semibold">Datadog</span>, on the Event Signal Processing team, where I
+              architect scalable event-driven systems that turn massive, high-frequency machine data into
+              something genuinely useful, for people and AI agents alike. I&apos;m driven by a simple
+              conviction: the highest use of cutting-edge technology is to advance how human societies
+              live, learn, and build, not just to ship features.
             </p>
-            
+
             <p>
-              My journey in tech has taken me from building ML platforms at Paperspace 
-              (acquired by DigitalOcean) to revolutionizing developer experience at Peloton, 
+              My focus is <span className="text-purple-600 dark:text-purple-400 font-semibold">architecting scalable event-driven and AI systems</span> for
+              enterprise, designing for a new kind of user that is part human, part autonomous agent.
+              Recently that&apos;s meant leveraging large language models to cut infrastructure alert noise
+              by over <span className="font-semibold">98%</span>, and building systems that enrich raw
+              change events with the context humans and agents actually need to act.
+            </p>
+
+            <p>
+              My path has taken me from building ML platforms at Paperspace
+              (acquired by DigitalOcean) to reimagining developer experience at Peloton,
               where my work on the Developer Insights Platform was featured in{' '}
               <span className="italic">The Pragmatic Engineer</span> newsletter.
             </p>
-            
+
             <p>
-              When I&apos;m not coding, you&apos;ll find me following economic trends, exploring 
-              new technologies, playing basketball, or diving deep into human psychology. 
-              I believe in building products that not only solve problems but also create 
-              delightful experiences for users.
+              Outside of Datadog, I co-founded{' '}
+              <a
+                href="https://www.brekkiebakery.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-purple-600 dark:text-purple-400 font-semibold hover:underline"
+              >
+                Brekkie Bakery
+              </a>
+              , a protein banana bread company in New York City that I build on nights and weekends.
+              Hauling bags of flour and hand-weighing batter loaf by loaf gave me a new obsession:
+              bringing AI and intelligent automation into the physical systems and machinery that
+              software hasn&apos;t fully reached yet.
+            </p>
+
+            <p>
+              When I&apos;m not shipping code or loaves, you&apos;ll find me following economic trends,
+              playing basketball, and thinking about how the next wave of technology can broaden
+              access and opportunity for everyone.
             </p>
           </div>
 

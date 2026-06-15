@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { blogPosts, readPostContent, slugify } from './blog-content';
 
 const prisma = new PrismaClient();
 
@@ -92,7 +93,35 @@ This is a draft post exploring ideas about decentralized content creation...`,
         },
       }),
     ]);
-    console.log(`✅ Created ${posts.length} blog posts`);
+    console.log(`✅ Created ${posts.length} sample blog posts`);
+
+    // Create the authored long-form posts (shared with the prod insert script)
+    for (const post of blogPosts) {
+      await prisma.blogPost.create({
+        data: {
+          author: { connect: { id: user.id } },
+          title: post.title,
+          slug: post.slug,
+          excerpt: post.excerpt,
+          content: readPostContent(post.file),
+          published: true,
+          publishedAt: post.publishedAt,
+          category: {
+            connectOrCreate: {
+              where: { slug: slugify(post.category) },
+              create: { name: post.category, slug: slugify(post.category) },
+            },
+          },
+          tags: {
+            connectOrCreate: post.tags.map(name => ({
+              where: { slug: slugify(name) },
+              create: { name, slug: slugify(name) },
+            })),
+          },
+        },
+      });
+    }
+    console.log(`✅ Created ${blogPosts.length} authored blog posts`);
 
     console.log('🎉 Seed completed successfully!');
   } catch (error) {

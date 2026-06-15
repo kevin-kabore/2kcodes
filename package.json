@@ -18,6 +18,7 @@
     "db:migrate:name": "dotenv -e .env.local -- prisma migrate dev --name",
     "db:migrate:prod": "prisma migrate deploy",
     "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts",
+    "db:insert-posts": "dotenv -e .env.local -- tsx scripts/insert-posts.ts",
     "db:studio": "dotenv -e .env.local -- prisma studio",
     "db:reset": "dotenv -e .env.local -- prisma migrate reset",
     "postgres:start": "brew services start postgresql@14 || echo 'PostgreSQL may already be running or use different installation'",
